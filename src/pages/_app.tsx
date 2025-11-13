@@ -47,6 +47,15 @@ function CategoryDrawer({
 }) {
   if (!open) return null;
 
+  // Handle category click - close on mobile only
+  const handleCategoryClick = () => {
+    // Check if we're on mobile (screen width < 768px)
+    if (window.innerWidth < 768) {
+      onClose();
+    }
+    // On desktop, drawer stays open so users can browse multiple categories
+  };
+
   return (
     <div className="fixed inset-0 z-[99998]">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
@@ -84,6 +93,7 @@ function CategoryDrawer({
                 key={c.label}
                 href={c.link}
                 className="flex items-center justify-between px-4 py-3 hover:bg-emerald-50"
+                onClick={handleCategoryClick}
               >
                 <span className="flex items-center gap-2">
                   <span className="inline-flex size-7 items-center justify-center rounded-md bg-emerald-100 shrink-0">

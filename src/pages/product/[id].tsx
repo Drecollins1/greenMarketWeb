@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Star, ChevronUp, ChevronDown } from "lucide-react";
 import { BsChatLeftText } from "react-icons/bs";
 import { FaMoneyBillTransfer } from "react-icons/fa6";
+import Link from "next/link";
 
 const allProducts = [
   {
@@ -172,9 +173,9 @@ export default function ProductDetails() {
               </button>
             </div>
 
-            <button className="rounded-md bg-green-600 px-4 py-2 text-white hover:bg-green-700 flex items-center gap-2 text-sm">
+            <Link href={"/message"} className="rounded-md bg-green-600 px-4 py-2 text-white hover:bg-green-700 flex items-center gap-2 text-sm">
               <BsChatLeftText size={18} /> Chat Seller
-            </button>
+            </Link>
             <button className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 flex items-center gap-2 text-sm">
               <FaMoneyBillTransfer size={18} /> Request Escrow
             </button>

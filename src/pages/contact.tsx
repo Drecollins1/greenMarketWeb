@@ -9,16 +9,17 @@ export default function ContactPage() {
     email: "",
     phone: "",
     subject: "",
+    message: "",
   });
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log("Form submitted:", formData);
   };
@@ -209,10 +210,12 @@ export default function ContactPage() {
                   <textarea
                     name="message"
                     placeholder="Your Message"
-                    rows="6"
+                    rows={6}
+                    value={formData.message}
+                    onChange={handleChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all resize-none"
                     required
-                  ></textarea>
+                  />
                 </div>
 
                 <button

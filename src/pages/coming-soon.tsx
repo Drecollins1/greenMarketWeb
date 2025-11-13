@@ -1,3 +1,4 @@
+// pages/404.tsx
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
@@ -9,7 +10,7 @@ const NotFoundPage: NextPage = () => {
         <title>Page Not Found - Greenmarket.com.ng</title>
         <meta name="description" content="The page you are looking for does not exist." />
       </Head>
-      <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full text-center space-y-8">
           <div className="space-y-4">
             <h1 className="text-6xl font-bold text-gray-900">404</h1>
@@ -26,7 +27,9 @@ const NotFoundPage: NextPage = () => {
               View FAQ
             </Link>
           </div>
-      
+          <div className="text-sm text-gray-500">
+            <p>© 2025 Greenmarket.com.ng. All rights reserved.</p>
+          </div>
         </div>
       </div>
     </>
