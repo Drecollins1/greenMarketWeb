@@ -233,7 +233,7 @@ export default function AuthPage() {
         )}
       </div>
 
-      {/* OTP Modal - ONLY NEW ADDITION */}
+      {/* OTP Modal */}
       {showOtpModal && (
         <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center px-4 z-50 bg-white backdrop-blur supports-[backdrop-filter]:bg-white/60 border-b border-neutral-200">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 animate-fadeIn">
