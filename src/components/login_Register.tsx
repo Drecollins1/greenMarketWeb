@@ -5,6 +5,8 @@ import { useRouter } from 'next/router';
 export default function AuthPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('login');
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [otp, setOtp] = useState('');
   const [loginData, setLoginData] = useState({ email: '' });
   const [registerData, setRegisterData] = useState({
     name: '',
@@ -37,7 +39,17 @@ export default function AuthPage() {
   const handleLogin = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     console.log('Login with:', loginData);
-    // Handle login logic here
+    setShowOtpModal(true);
+  };
+
+  const handleOtpSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    console.log('OTP submitted:', otp);
+    setShowOtpModal(false);
+  };
+
+  const handleResendOtp = () => {
+    console.log('Resending OTP...');
   };
 
   const handleRegister = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -220,6 +232,70 @@ export default function AuthPage() {
           </div>
         )}
       </div>
+
+      {/* OTP Modal - ONLY NEW ADDITION */}
+      {showOtpModal && (
+        <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center px-4 z-50 bg-white backdrop-blur supports-[backdrop-filter]:bg-white/60 border-b border-neutral-200">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 animate-fadeIn">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2 text-center">
+              Log In Your Account
+            </h2>
+
+            <div className="space-y-6 mt-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-500 mb-2">
+                  OTP
+                </label>
+                <input
+                  type="text"
+                  value={otp}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOtp(e.target.value)}
+                  placeholder="Enter OTP"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
+                  maxLength={6}
+                />
+              </div>
+
+              <div className="flex justify-between items-center text-sm">
+                <button
+                  onClick={() => setShowOtpModal(false)}
+                  className="text-gray-700 cursor-pointer hover:text-gray-900 font-medium"
+                >
+                  Go back to login
+                </button>
+                <button
+                  onClick={handleResendOtp}
+                  className="text-green-600 cursor-pointer hover:text-green-700 font-semibold"
+                >
+                  Resend Otp
+                </button>
+              </div>
+
+              <button
+                onClick={handleOtpSubmit}
+                className="w-full cursor-pointer bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors shadow-md hover:shadow-lg"
+              >
+                Log In
+              </button>
+
+              <div className="text-center pt-4 border-t border-gray-200">
+                <p className="text-sm cursor-pointer text-gray-600">
+                  Don't have an account?{' '}
+                  <button
+                    onClick={() => {
+                      setShowOtpModal(false);
+                      switchToRegister();
+                    }}
+                    className="text-green-600 cursor-pointer font-semibold hover:text-green-700"
+                  >
+                    Sign Up
+                  </button>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <style jsx>{`
         @keyframes fadeIn {
