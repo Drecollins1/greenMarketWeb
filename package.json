@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build --turbopack",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint"
   },
@@ -15,7 +15,8 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-icons": "^5.5.0",
-    "react-mobile-app-button": "^1.2.19"
+    "react-mobile-app-button": "^1.2.19",
+    "recharts": "^3.4.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
