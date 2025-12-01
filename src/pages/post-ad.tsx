@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { getCategories } from "@/services/category";
-import {getPlans} from "@/services/plan";
-import Image from 'next/image';
+import { getPlans } from "@/services/plan";
 
 type Category = {
   id: number;
@@ -23,6 +22,15 @@ type ImageFile = {
   size: number;
 };
 
+type Plan = {
+  id: number;
+  title: string;
+  pricing: { [duration: string]: number } | [];
+  is_recommended: number;
+  created_at: string;
+  updated_at: string;
+};
+
 export default function NewProductForm() {
   const [formData, setFormData] = useState({
     title: '',
@@ -37,10 +45,12 @@ export default function NewProductForm() {
   const [tagInput, setTagInput] = useState('');
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [showPromoteModal, setShowPromoteModal] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState<'freemium' | 'top' | 'premium'>('freemium');
+  const [selectedPlan, setSelectedPlan] = useState<number | null>(null);
   const [selectedDuration, setSelectedDuration] = useState<string | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
+  const [plansLoading, setPlansLoading] = useState(false);
   const [images, setImages] = useState<ImageFile[]>([]);
   const [imageError, setImageError] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -62,6 +72,36 @@ export default function NewProductForm() {
 
     fetchCategories();
   }, []);
+
+  // Fetch plans when modal opens
+  useEffect(() => {
+    async function fetchPlans() {
+      if (showPromoteModal && plans.length === 0) {
+        setPlansLoading(true);
+        try {
+          const fetchedPlans = await getPlans();
+          if (fetchedPlans) {
+            setPlans(fetchedPlans);
+            
+            // Auto-select freemium plan if exists
+            const freemiumPlan = fetchedPlans.find(plan => 
+              plan.title.toLowerCase() === 'freemium'
+            );
+            if (freemiumPlan) {
+              setSelectedPlan(freemiumPlan.id);
+              setSelectedDuration(null);
+            }
+          }
+        } catch (error) {
+          console.error("Error loading plans:", error);
+        } finally {
+          setPlansLoading(false);
+        }
+      }
+    }
+
+    fetchPlans();
+  }, [showPromoteModal, plans.length]);
 
   // Validate form and disable button
   const isFormValid = () => {
@@ -99,20 +139,31 @@ export default function NewProductForm() {
   };
 
   const handlePostAd = () => {
-    // Prepare form data with images - This is where we format for API
+    // Prepare form data with images
+    const selectedPlanData = plans.find(plan => plan.id === selectedPlan);
+    
+    let planPrice = null;
+    if (selectedPlanData && selectedDuration && !Array.isArray(selectedPlanData.pricing)) {
+      // Type-safe access to pricing
+      planPrice = selectedPlanData.pricing[selectedDuration];
+    }
+    
     const submitData = {
       ...formData,
+      plan_id: selectedPlan,
+      plan_duration: selectedDuration,
+      plan_price: planPrice,
       // Format images for API: images[0], images[1], etc.
       images: images.map((img, index) => ({
-        [`images[${index}]`]: img.file, // This creates images[0], images[1], etc.
+        [`images[${index}]`]: img.file,
       })),
       // Format tags for API: tags[0], tags[1], etc.
       tags: formData.tags.map((tag, index) => ({
-        [`tags[${index}]`]: tag, // This creates tags[0], tags[1], etc.
+        [`tags[${index}]`]: tag,
       }))
     };
     
-    // For actual API submission, you might need to format differently:
+    // For actual API submission
     const apiFormData = new FormData();
     
     // Add regular fields
@@ -123,6 +174,14 @@ export default function NewProductForm() {
     apiFormData.append('state', formData.state);
     apiFormData.append('city', formData.city);
     apiFormData.append('busStop', formData.busStop);
+    
+    // Add plan information
+    if (selectedPlan) {
+      apiFormData.append('plan_id', selectedPlan.toString());
+      if (selectedDuration) {
+        apiFormData.append('plan_duration', selectedDuration);
+      }
+    }
     
     // Add images as images[0], images[1], etc.
     images.forEach((img, index) => {
@@ -136,8 +195,10 @@ export default function NewProductForm() {
     
     console.log('Form submitted:', submitData);
     console.log('FormData for API:', apiFormData);
-    console.log('Selected plan:', selectedPlan);
+    console.log('Selected plan ID:', selectedPlan);
     console.log('Duration:', selectedDuration);
+    console.log('Selected plan data:', selectedPlanData);
+    
     setShowPromoteModal(false);
     
     // Handle form submission - you would send apiFormData to your API
@@ -244,6 +305,23 @@ export default function NewProductForm() {
     e.preventDefault();
   };
 
+  // Helper function to get price for a duration
+  const getPriceForDuration = (plan: Plan, duration: string): number => {
+    if (Array.isArray(plan.pricing)) return 0;
+    
+    // Type-safe check
+    const price = plan.pricing[duration];
+    return price || 0;
+  };
+
+  // Format price with Naira symbol
+  const formatPrice = (price: number) => {
+    return `₦ ${price.toLocaleString('en-US')}.00`;
+  };
+
+  // Get selected plan data
+  const selectedPlanData = selectedPlan ? plans.find(plan => plan.id === selectedPlan) : null;
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
@@ -313,7 +391,7 @@ export default function NewProductForm() {
                       <option>Loading categories...</option>
                     ) : (
                       categories.map((category) => (
-                        <option key={category.id} value={category.id}>
+                        <option key={category.id} value={category.id.toString()}>
                           {category.name}
                         </option>
                       ))
@@ -397,7 +475,6 @@ export default function NewProductForm() {
                               </svg>
                             </button>
                           </div>
-                          {/* Removed images[{index}] notation from UI */}
                           <div className="text-xs text-gray-500 mt-1 truncate">
                             Image {index + 1} - {(img.size / 1024).toFixed(2)}KB
                           </div>
@@ -491,7 +568,7 @@ export default function NewProductForm() {
                       key={tag}
                       className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm flex items-center gap-2"
                     >
-                      {tag} {/* Removed tags[{index}]: notation from UI */}
+                      {tag}
                       <button
                         type="button"
                         onClick={() => removeTag(tag)}
@@ -571,116 +648,132 @@ export default function NewProductForm() {
               Select your Ad plan from list below area.
             </p>
 
-            <div className="space-y-4">
-              {/* Freemium Plan */}
-              <div
-                onClick={() => {
-                  setSelectedPlan('freemium');
-                  setSelectedDuration(null);
-                }}
-                className={`relative rounded-xl p-4 cursor-pointer transition-all ${
-                  selectedPlan === 'freemium'
-                    ? 'bg-green-100 border-2 border-[#39B54A]'
-                    : 'bg-gray-50 border-2 border-transparent hover:border-gray-300'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                      selectedPlan === 'freemium' ? 'border-[#39B54A]' : 'border-gray-300'
-                    }`}>
-                      {selectedPlan === 'freemium' && (
-                        <div className="w-3 h-3 rounded-full bg-[#39B54A]"></div>
+            {plansLoading ? (
+              <div className="text-center py-8">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#39B54A]"></div>
+                <p className="text-gray-500 mt-2">Loading plans...</p>
+              </div>
+            ) : plans.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-gray-500">No plans available</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {plans.map((plan) => {
+                  const isFreemium = Array.isArray(plan.pricing);
+                  const pricingKeys = isFreemium ? [] : Object.keys(plan.pricing);
+                  
+                  // Get first price for display
+                  let displayPrice = 0;
+                  if (!isFreemium && pricingKeys.length > 0) {
+                    displayPrice = getPriceForDuration(plan, pricingKeys[0]);
+                  }
+                  
+                  return (
+                    <div
+                      key={plan.id}
+                      onClick={() => {
+                        if (isFreemium) {
+                          setSelectedPlan(plan.id);
+                          setSelectedDuration(null);
+                        }
+                      }}
+                      className={`relative rounded-xl p-4 cursor-pointer transition-all ${
+                        selectedPlan === plan.id
+                          ? isFreemium 
+                            ? 'bg-green-100 border-2 border-[#39B54A]'
+                            : 'bg-white border-2 border-[#39B54A]'
+                          : isFreemium
+                            ? 'bg-gray-50 border-2 border-transparent hover:border-gray-300'
+                            : 'bg-white border border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      <div className={`flex items-center justify-between ${isFreemium ? '' : 'mb-4'}`}>
+                        <div className="flex items-center gap-3">
+                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                            selectedPlan === plan.id ? 'border-[#39B54A]' : 'border-gray-300'
+                          }`}>
+                            {selectedPlan === plan.id && (
+                              <div className="w-3 h-3 rounded-full bg-[#39B54A]"></div>
+                            )}
+                          </div>
+                          <span className="font-semibold text-gray-900">{plan.title}</span>
+                        </div>
+                        <span className={`text-xs font-semibold px-3 py-1 rounded-full ${
+                          isFreemium
+                            ? 'bg-[#39B54A] text-white'
+                            : 'text-[#39B54A]'
+                        }`}>
+                          {isFreemium ? 'Free' : formatPrice(displayPrice)}
+                        </span>
+                      </div>
+                      
+                      {/* Duration buttons for non-freemium plans */}
+                      {!isFreemium && pricingKeys.length > 0 && (
+                        <div className="mt-4 flex gap-2 flex-wrap">
+                          {pricingKeys.map((duration) => {
+                            const price = getPriceForDuration(plan, duration);
+                            const isSelected = selectedPlan === plan.id && selectedDuration === duration;
+                            
+                            return (
+                              <button
+                                key={duration}
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedPlan(plan.id);
+                                  setSelectedDuration(duration);
+                                }}
+                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                                  isSelected
+                                    ? 'bg-[#39B54A] text-white'
+                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                }`}
+                              >
+                                {duration}
+                              </button>
+                            );
+                          })}
+                        </div>
                       )}
                     </div>
-                    <span className="font-semibold text-gray-900">Freemium plan</span>
-                  </div>
-                  <span className="bg-[#39B54A] text-white text-xs font-semibold px-3 py-1 rounded-full">
-                    Free
-                  </span>
-                </div>
+                  );
+                })}
               </div>
-
-              {/* Top Section */}
-              <div 
-                onClick={() => setSelectedPlan('top')}
-                className={`rounded-xl p-4 cursor-pointer transition-all ${
-                  selectedPlan === 'top'
-                    ? 'bg-white border-2 border-[#39B54A]'
-                    : 'bg-white border border-gray-200'
-                }`}
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-bold text-gray-900">Top</h3>
-                  <span className="text-[#39B54A] font-bold text-lg">₦ 230.00</span>
-                </div>
-                <div className="flex gap-2 flex-wrap">
-                  {['1 Day', '7 Days', '14 Days', '30 Days'].map((duration) => (
-                    <button
-                      key={duration}
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedPlan('top');
-                        setSelectedDuration(duration);
-                      }}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        selectedPlan === 'top' && selectedDuration === duration
-                          ? 'bg-[#39B54A] text-white'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      {duration}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Premium Section */}
-              <div 
-                onClick={() => setSelectedPlan('premium')}
-                className={`rounded-xl p-4 cursor-pointer transition-all ${
-                  selectedPlan === 'premium'
-                    ? 'bg-white border-2 border-[#39B54A]'
-                    : 'bg-white border border-gray-200'
-                }`}
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-bold text-gray-900">Premium</h3>
-                  <span className="text-[#39B54A] font-bold text-lg">₦ 14,999.00</span>
-                </div>
-                <div className="flex gap-2 flex-wrap">
-                  {['1 Month', '6 Months'].map((duration) => (
-                    <button
-                      key={duration}
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedPlan('premium');
-                        setSelectedDuration(duration);
-                      }}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        selectedPlan === 'premium' && selectedDuration === duration
-                          ? 'bg-[#39B54A] text-white'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      {duration}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
+            )}
 
             {/* Post AD Button */}
             <div className="mt-6 flex justify-center">
               <button
                 onClick={handlePostAd}
-                className="bg-[#39B54A] hover:bg-[#39B54A] text-white px-12 py-3 rounded-full font-semibold text-lg transition-colors shadow-md hover:shadow-lg"
+                disabled={!selectedPlan}
+                className={`px-12 py-3 rounded-full font-semibold text-lg transition-colors shadow-md hover:shadow-lg ${
+                  selectedPlan
+                    ? 'bg-[#39B54A] hover:bg-[#39B54A] text-white'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
               >
                 Post AD
               </button>
             </div>
+            
+            {/* Selected plan summary */}
+            {selectedPlanData && (
+              <div className="mt-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                <p className="text-sm text-gray-700">
+                  <span className="font-medium">Selected:</span> {selectedPlanData.title}
+                  {selectedDuration && ` • ${selectedDuration}`}
+                  {selectedDuration && !Array.isArray(selectedPlanData.pricing) && selectedPlanData.pricing[selectedDuration] !== undefined && (
+                    <span className="font-bold text-[#39B54A] ml-2">
+                      {formatPrice(selectedPlanData.pricing[selectedDuration])}
+                    </span>
+                  )}
+                  {Array.isArray(selectedPlanData.pricing) && (
+                    <span className="font-bold text-[#39B54A] ml-2">Free</span>
+                  )}
+                </p>
+              </div>
+            )}
           </div>
         </div>
       )}
