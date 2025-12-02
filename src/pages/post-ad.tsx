@@ -6,6 +6,10 @@ import { getPlans } from "@/services/plan";
 import locationService from "@/services/country"; 
 import ApiFetcher from '@/utils/apis';
 import { toast } from 'react-toastify';
+import { useRouter } from 'next/navigation';
+
+// Import the PaymentSuccessModal component
+import { PaymentSuccessModal } from './paymentModal';
 
 type Category = {
   id: number;
@@ -25,6 +29,7 @@ type ImageFile = {
   size: number;
 };
 
+// Fixed Plan type to properly handle pricing
 type Plan = {
   id: number;
   title: string;
@@ -34,12 +39,70 @@ type Plan = {
   updated_at: string;
 };
 
+// Helper type guard to check if pricing is an object (not array)
+const isPricingObject = (pricing: Plan['pricing']): pricing is { [duration: string]: number } => {
+  return !Array.isArray(pricing);
+};
+
 type State = {
   name: string;
   state_code: string;
 };
 
+type PaymentResponse = {
+  authorization_url: string;
+  access_code: string;
+  reference: string;
+  open: string;
+  message: string;
+};
+
+type ProductResponse = {
+  data: {
+    id: number;
+    category_id: string;
+    title: string;
+    description: string;
+    state: string;
+    local: string;
+    price: string;
+    tags: string[];
+    nearest: string;
+    use_escrow: string;
+    images: string[];
+    user_id: number;
+    slug: string;
+    updated_at: string;
+    created_at: string;
+    plan_id: number;
+    views: number;
+    user: {
+      avatar: string;
+      id: number;
+      name: string;
+      phone: string;
+      email: string;
+      banner: string | null;
+    };
+    subscription?: {
+      id: number;
+      product_id: number;
+      title: string;
+      span: string;
+      amount: number;
+      start: string;
+      end: string;
+      created_at: string;
+      updated_at: string;
+    };
+  };
+  message: string;
+  status: boolean;
+};
+
 export default function NewProductForm() {
+  const router = useRouter();
+  
   const [formData, setFormData] = useState({
     title: '',
     category: '',
@@ -61,6 +124,11 @@ export default function NewProductForm() {
   const [plansLoading, setPlansLoading] = useState(false);
   const [images, setImages] = useState<ImageFile[]>([]);
   const [imageError, setImageError] = useState('');
+  
+  // New states for payment flow
+  const [showPaymentSuccessModal, setShowPaymentSuccessModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [createdProductId, setCreatedProductId] = useState<string | null>(null);
   
   // State for location data
   const [states, setStates] = useState<State[]>([]);
@@ -244,7 +312,7 @@ export default function NewProductForm() {
   const isFormValid = () => {
     const requiredFields = ['title', 'category', 'price', 'description', 'state', 'city'];
     return requiredFields.every(field => formData[field as keyof typeof formData]) && 
-           formData.tags.length > 0;
+           formData.tags.length > 0 && images.length > 0;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -277,75 +345,170 @@ export default function NewProductForm() {
     setShowPromoteModal(true);
   };
 
-  const handlePostAd = async () => {
+  // Function to initialize payment - using ApiFetcher (Axios)
+  const initializePayment = async (productId: string, amount: number, planTitle: string) => {
     try {
-      // Prepare form data with images
-      const selectedPlanData = plans.find(plan => plan.id === selectedPlan);
-      
-      let planPrice = null;
-      if (selectedPlanData && selectedDuration && !Array.isArray(selectedPlanData.pricing)) {
-        // Type-safe access to pricing
-        planPrice = selectedPlanData.pricing[selectedDuration];
+      const response = await ApiFetcher.post(`/payment/paystack/initialize?type=boost&item_id=${productId}`);
+
+      if (!response) {
+        throw new Error('Failed to initialize payment');
       }
+
+      // Axios response has data property directly
+      const paymentData: PaymentResponse = response.data;
       
+      // Redirect to Paystack payment page
+      if (paymentData.authorization_url) {
+        window.location.href = paymentData.authorization_url;
+      } else {
+        toast.error("Payment initialization failed");
+      }
+    } catch (error: any) {
+      // Handle Axios error response
+      if (error.response?.data?.message) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("Failed to initialize payment. Please try again.");
+      }
+      console.error("Error initializing payment:", error);
+      setIsSubmitting(false);
+    }
+  };
+
+  // Main function to handle ad posting
+  const handlePostAd = async () => {
+    if (!selectedPlan) {
+      toast.error("Please select a plan");
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    try {
+      const selectedPlanData = plans.find(plan => plan.id === selectedPlan);
+      const isFreemium = selectedPlanData && Array.isArray(selectedPlanData.pricing);
+      
+      // Prepare FormData
       const apiFormData = new FormData();
       
-      // Add regular fields
+      // Add required fields
+      apiFormData.append('category_id', formData.category);
       apiFormData.append('title', formData.title);
-      apiFormData.append('category', formData.category);
-      apiFormData.append('price', formData.price);
       apiFormData.append('description', formData.description);
-      apiFormData.append('country', country);
       apiFormData.append('state', formData.state);
       apiFormData.append('local', formData.city);
+      apiFormData.append('price', formData.price);
       apiFormData.append('nearest', formData.busStop);
-      apiFormData.append('plan_price', planPrice ? planPrice.toString() : '0');
+      apiFormData.append('use_escrow', '1');
       
       // Add plan information
-      if (selectedPlan) {
-        apiFormData.append('plan_id', selectedPlan.toString());
-        if (selectedDuration) {
-          apiFormData.append('plan_duration', selectedDuration);
+      if (selectedPlanData) {
+        apiFormData.append('plan[title]', selectedPlanData.title);
+        
+        if (!isFreemium && selectedDuration) {
+          // Use type guard to safely access pricing
+          if (isPricingObject(selectedPlanData.pricing)) {
+            const planPrice = selectedPlanData.pricing[selectedDuration];
+            apiFormData.append('plan[price]', planPrice.toString());
+            apiFormData.append('plan[span]', selectedDuration);
+          } else {
+            toast.error("Invalid pricing structure for this plan.");
+            setIsSubmitting(false);
+            return;
+          }
+        } else {
+          apiFormData.append('plan[price]', '0');
+          apiFormData.append('plan[span]', 'free');
         }
       }
       
-      // Add images as images[0], images[1], etc.
+      // Add images
       images.forEach((img, index) => {
         apiFormData.append(`images[${index}]`, img.file);
       });
       
-      // Add tags as tags[0], tags[1], etc.
+      // Add tags
       formData.tags.forEach((tag, index) => {
         apiFormData.append(`tags[${index}]`, tag);
       });
       
-      setShowPromoteModal(false);
-      
-      // Handle form submission - you would send apiFormData to your API
-      // Example: await fetch('/api/products', { method: 'POST', body: apiFormData });
-      
-      // For now, show success message
-      toast.success("Ad posted successfully!");
-      
-      // Reset form after successful submission
-      setFormData({
-        title: '',
-        category: '',
-        price: '',
-        description: '',
-        state: states.find(s => s.name.toLowerCase().includes('lagos'))?.name || '',
-        city: '',
-        busStop: '',
-        tags: [],
+      // Step 1: Create the product using ApiFetcher (Axios)
+      const createProductResponse = await ApiFetcher.post('/products', apiFormData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
-      setImages([]);
-      setSelectedPlan(null);
-      setSelectedDuration(null);
+
+      // Axios response has data property directly
+      const productData: ProductResponse = createProductResponse.data;
       
-    } catch (error) {
-      toast.error("Failed to post ad. Please try again.");
+      if (!productData.status || !productData.data) {
+        throw new Error('Failed to create product');
+      }
+
+      const productId = productData.data.id.toString();
+      
+      if (!productId) {
+        throw new Error('Product ID not received');
+      }
+
+      setCreatedProductId(productId);
+      
+      // Step 2: Handle based on plan type
+      if (isFreemium) {
+        // For freemium plan, show success modal directly
+        setShowPromoteModal(false);
+        setShowPaymentSuccessModal(true);
+        toast.success("Ad posted successfully with freemium plan!");
+      } else {
+        // For paid plans, initialize payment
+        if (selectedPlanData && selectedDuration && isPricingObject(selectedPlanData.pricing)) {
+          const planPrice = selectedPlanData.pricing[selectedDuration];
+          
+          // Close the promote modal
+          setShowPromoteModal(false);
+          
+          // Initialize payment
+          await initializePayment(productId, planPrice, selectedPlanData.title);
+        } else {
+          toast.error("Unable to process payment for this plan.");
+        }
+      }
+      
+    } catch (error: any) {
+      // Handle Axios error response
+      if (error.response?.data?.message) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("Failed to post ad. Please try again.");
+      }
       console.error("Error posting ad:", error);
+    } finally {
+      setIsSubmitting(false);
     }
+  };
+
+  // Handle payment success modal close
+  const handlePaymentSuccessClose = () => {
+    setShowPaymentSuccessModal(false);
+    
+    // Reset form after successful submission
+    setFormData({
+      title: '',
+      category: '',
+      price: '',
+      description: '',
+      state: states.find(s => s.name.toLowerCase().includes('lagos'))?.name || '',
+      city: '',
+      busStop: '',
+      tags: [],
+    });
+    setImages([]);
+    setSelectedPlan(null);
+    setSelectedDuration(null);
+    
+    // Redirect to profile page
+    router.push('/profile');
   };
 
   const addTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -455,13 +618,16 @@ export default function NewProductForm() {
     e.preventDefault();
   };
 
-  // Helper function to get price for a duration
+  // Helper function to get price for a duration - FIXED
   const getPriceForDuration = (plan: Plan, duration: string): number => {
     if (Array.isArray(plan.pricing)) return 0;
     
-    // Type-safe check
-    const price = plan.pricing[duration];
-    return price || 0;
+    // Use type guard for safe access
+    if (isPricingObject(plan.pricing)) {
+      const price = plan.pricing[duration];
+      return price || 0;
+    }
+    return 0;
   };
 
   // Format price with Naira symbol
@@ -926,14 +1092,21 @@ export default function NewProductForm() {
             <div className="mt-6 flex justify-center">
               <button
                 onClick={handlePostAd}
-                disabled={!selectedPlan}
+                disabled={!selectedPlan || isSubmitting}
                 className={`px-12 py-3 rounded-full font-semibold text-lg transition-colors shadow-md hover:shadow-lg ${
-                  selectedPlan
+                  selectedPlan && !isSubmitting
                     ? 'bg-[#39B54A] hover:bg-[#39B54A] text-white'
                     : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 }`}
               >
-                Post AD
+                {isSubmitting ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Processing...
+                  </div>
+                ) : (
+                  'Post AD'
+                )}
               </button>
             </div>
             
@@ -943,7 +1116,9 @@ export default function NewProductForm() {
                 <p className="text-sm text-gray-700">
                   <span className="font-medium">Selected:</span> {selectedPlanData.title}
                   {selectedDuration && ` • ${selectedDuration}`}
-                  {selectedDuration && !Array.isArray(selectedPlanData.pricing) && selectedPlanData.pricing[selectedDuration] !== undefined && (
+                  {selectedDuration && !Array.isArray(selectedPlanData.pricing) && 
+                   isPricingObject(selectedPlanData.pricing) && 
+                   selectedPlanData.pricing[selectedDuration] !== undefined && (
                     <span className="font-bold text-[#39B54A] ml-2">
                       {formatPrice(selectedPlanData.pricing[selectedDuration])}
                     </span>
@@ -956,6 +1131,14 @@ export default function NewProductForm() {
             )}
           </div>
         </div>
+      )}
+
+      {/* Payment Success Modal */}
+      {showPaymentSuccessModal && (
+        <PaymentSuccessModal
+          isOpen={showPaymentSuccessModal}
+          onClose={handlePaymentSuccessClose}
+        />
       )}
     </div>
   );
