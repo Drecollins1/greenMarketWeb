@@ -22,7 +22,6 @@ export const PaymentSuccessModal: React.FC<PaymentSuccessModalProps> = ({ isOpen
     };
   }, [isOpen]);
 
-  if (!isOpen || !mounted) return null; // Prevent duplicate mount animation in StrictMode
 
   return (
     <div
