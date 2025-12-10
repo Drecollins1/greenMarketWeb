@@ -3,6 +3,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { Home, Store, Users } from "lucide-react";
 import { FaAd } from "react-icons/fa";
+import { useState, useEffect } from "react";
 
 const bottomNavItems = [
   { label: "Home", href: "/", icon: Home },
@@ -13,9 +14,36 @@ const bottomNavItems = [
 
 export default function MobileBottomNav() {
   const pathname = usePathname();
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      // Show navbar when scrolling up, hide when scrolling down
+      if (currentScrollY < lastScrollY || currentScrollY < 10) {
+        setIsVisible(true);
+      } else if (currentScrollY > lastScrollY && currentScrollY > 10) {
+        setIsVisible(false);
+      }
+      
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [lastScrollY]);
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-neutral-200 shadow-lg">
+    <nav
+      className={`md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-neutral-200 shadow-lg transition-transform duration-300 ease-in-out ${
+        isVisible ? "translate-y-0" : "translate-y-full"
+      }`}
+    >
       <div className="flex items-center justify-around px-2 py-3">
         {bottomNavItems.map((item) => {
           const Icon = item.icon;

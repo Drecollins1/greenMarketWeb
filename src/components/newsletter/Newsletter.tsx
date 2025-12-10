@@ -1,4 +1,3 @@
-// components/newsletter/Newsletter.tsx
 "use client";
 
 import { useState, FormEvent } from "react";
@@ -12,10 +11,8 @@ export default function Newsletter() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Add your newsletter subscription logic here
     console.log("Subscribing email:", email);
 
-    // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     setEmail("");
@@ -23,14 +20,14 @@ export default function Newsletter() {
   };
 
   return (
-    <section className=" px-4 md:px-8 w-full">
+    <section className=" px-2 mb-20 md:px-8 w-full">
       <div className="max-w-7xl mx-auto">
         <div className="relative bg-gradient-to-br from-emerald-50 to-teal-50 rounded-3xl overflow-hidden">
           <div className="grid lg:grid-cols-2 gap-8 items-center p-8 md:p-12 lg:p-16">
             {/* Content */}
             <div className="space-y-6">
               <div>
-                <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3 leading-tight">
+                <h2 className="text-2xl md:text-4xl font-bold text-gray-900 mb-3 leading-tight">
                   Buy and Sell Fresh Farm Products Anytime, Anywhere.
                 </h2>
                 <p className="text-gray-600 text-base md:text-lg">
