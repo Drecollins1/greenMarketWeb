@@ -21,7 +21,6 @@ import { TiUserAdd } from "react-icons/ti";
 const navRoutes = [
   { label: "Home", href: "/" },
   { label: "About", href: "/about" },
-  { label: "Profile", href: "/profile" },
   { label: "shop", href: "/shop" },
   { label: "How Escrow Works", href: "/howEscrowWorks" },
   { label: "Community", href: "/community" },
@@ -118,16 +117,16 @@ export default function Header({
 
   const checkAuthStatus = () => {
     // Check if user is logged in (you can modify this based on your auth logic)
-    const token = localStorage.getItem('authToken');
-    const user = localStorage.getItem('user');
+    const token = sessionStorage.getItem('authToken');
+    const user = sessionStorage.getItem('user');
     setIsLoggedIn(!!token || !!user);
   };
 
   const handleLogout = () => {
-    // Clear auth data from localStorage
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('user');
-    localStorage.removeItem('loginEmail');
+    // Clear auth data from sessionStorage
+    sessionStorage.removeItem('authToken');
+    sessionStorage.removeItem('user');
+    sessionStorage.removeItem('loginEmail');
     
     // Update state
     setIsLoggedIn(false);

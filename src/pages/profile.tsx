@@ -1,20 +1,22 @@
 import React, { useState, useEffect } from "react";
-import {
-  User,
-  Package,
-  ShoppingCart,
-  MessageSquare,
-  Home,
-  Menu,
-  X,
-} from "lucide-react";
+import { User, Package, ShoppingCart, MessageSquare, Home, Menu, X,} from "lucide-react";
 import { FaChevronRight } from "react-icons/fa6";
 import EscrowRequests from "@/components/EscrowOrders";
 import { getDashboardStats, DashboardStats } from "@/services/dashboard";
 import { getProfile, UserProfile } from "@/services/profile";
 import { getMyProducts } from "@/services/products";
 import { ProductData } from "@/types/product";
+import { getOffers } from "@/services/escrow";
+import { OfferData } from "@/types/escrow";
 import Link from "next/link";
+import { formatWalletAmount, formatPrice } from "@/utils/func";
+import DashboardTab from "@/components/DashboardTab";
+import OrdersTab from "@/components/OrdersTab";
+import ProductsTab from "@/components/ProductsTab";
+import MessagesTab from "@/components/MessagesTab";
+import ProfileTab from "@/components/ProfileTab";
+import EscrowTab from "@/components/EscrowTab";
+import { getOrders } from "@/services/orders"
 
 // Types
 interface VendorProfile {
@@ -119,7 +121,7 @@ const Profile = () => {
   );
   const [loading, setLoading] = useState(false);
   const [profileLoading, setProfileLoading] = useState(false);
-  const [productsLoading, setProductsLoading] = useState(false);
+  const [myOrders, setMyOrder] = useState(false);
 
   // Fetch dashboard data when component mounts or when activeTab changes to dashboard
   useEffect(() => {
@@ -181,14 +183,14 @@ const Profile = () => {
   };
 
   const fetchMyProducts = async () => {
-    setProductsLoading(true);
+    setLoading(true);
     try {
       const data = await getMyProducts();
       setMyProducts(data);
     } catch (error) {
       console.error("Failed to fetch products:", error);
     } finally {
-      setProductsLoading(false);
+      setLoading(false);
     }
   };
 
@@ -214,23 +216,6 @@ const Profile = () => {
   const handleTabChange = (tab: TabType) => {
     setActiveTab(tab);
     setSidebarOpen(false);
-  };
-
-  // Format wallet amount with proper currency formatting
-  const formatWalletAmount = (amount: string) => {
-    const numAmount = parseFloat(amount);
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(numAmount);
-  };
-
-  // Format price for display
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(price);
   };
 
   // Get user display name
@@ -366,7 +351,7 @@ const Profile = () => {
                 }`}
               >
                 <span>Products</span>
-                {productsLoading && (
+                {loading && (
                   <div className="w-4 h-4 border-2 border-[#39B54A] border-t-transparent rounded-full animate-spin"></div>
                 )}
               </button>
@@ -654,7 +639,7 @@ const Profile = () => {
               </div>
             )}
 
-            {/* Products Tab - Updated with Real API Data */}
+            {/* Products Tab */}
             {activeTab === "products" && (
               <div>
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
@@ -666,7 +651,7 @@ const Profile = () => {
                   </Link>
                 </div>
 
-                {productsLoading ? (
+                {loading ? (
                   <div className="flex justify-center items-center py-12">
                     <div className="w-8 h-8 border-4 border-[#39B54A] border-t-transparent rounded-full animate-spin"></div>
                   </div>
