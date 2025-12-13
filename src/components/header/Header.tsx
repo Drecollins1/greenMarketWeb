@@ -76,7 +76,7 @@ function SearchBar({ className = "" }: { className?: string }) {
         </button>
         {/* Location Dropdown */}
         {locationOpen && (
-          <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-neutral-200 rounded-md shadow-lg z-[9999]">
+          <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-neutral-200 rounded-md shadow-lg z-9999">
             {locations.map((loc) => (
               <button
                 key={loc.value}
@@ -117,7 +117,7 @@ export default function Header({
 
   const checkAuthStatus = () => {
     // Check if user is logged in (you can modify this based on your auth logic)
-    const token = sessionStorage.getItem('authToken');
+    const token = sessionStorage.getItem('jwt');
     const user = sessionStorage.getItem('user');
     setIsLoggedIn(!!token || !!user);
   };
@@ -137,7 +137,7 @@ export default function Header({
 
   return (
     <>
-      <header className="sticky top-0 z-[9999] bg-white backdrop-blur supports-[backdrop-filter]:bg-white/60 border-b border-neutral-200">
+      <header className="sticky top-0 z-9999 bg-white backdrop-blur supports-backdrop-filter:bg-white/60 border-b border-neutral-200">
         {/* Top bar */}
         <div className="container max-w-7xl mx-auto flex items-center gap-3 py-3">
           {/* Logo on the left */}
@@ -238,7 +238,7 @@ export default function Header({
       </header>
       {/* Mobile nav drawer - Portal to body level */}
       <div
-        className={`fixed inset-0 z-[99999] transition-opacity duration-300 ${
+        className={`fixed inset-0 z-99999 transition-opacity duration-300 ${
           navOpen
             ? "opacity-100 pointer-events-auto"
             : "opacity-0 pointer-events-none"

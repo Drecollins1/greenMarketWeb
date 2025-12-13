@@ -6,17 +6,8 @@ import { getDashboardStats, DashboardStats } from "@/services/dashboard";
 import { getProfile, UserProfile } from "@/services/profile";
 import { getMyProducts } from "@/services/products";
 import { ProductData } from "@/types/product";
-import { getOffers } from "@/services/escrow";
-import { OfferData } from "@/types/escrow";
 import Link from "next/link";
 import { formatWalletAmount, formatPrice } from "@/utils/func";
-import DashboardTab from "@/components/DashboardTab";
-import OrdersTab from "@/components/OrdersTab";
-import ProductsTab from "@/components/ProductsTab";
-import MessagesTab from "@/components/MessagesTab";
-import ProfileTab from "@/components/ProfileTab";
-import EscrowTab from "@/components/EscrowTab";
-import { getOrders } from "@/services/orders"
 
 // Types
 interface VendorProfile {
