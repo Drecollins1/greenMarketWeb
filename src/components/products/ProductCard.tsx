@@ -12,13 +12,14 @@ export type Product = {
   unit?: string;
   vendor?: string;
   image: string;
+  rating: string;
 };
 
 export default function ProductCard({ product }: { product: Product }) {
   return (
     <div className="group rounded-xl border border-neutral-200 bg-white p-3 transition-shadow hover:shadow-sm">
       {/* Product Image */}
-      <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
+      <div className="relative aspect-4/3 overflow-hidden rounded-lg">
         <Image
           src={product.image}
           alt={product.name}
@@ -40,13 +41,16 @@ export default function ProductCard({ product }: { product: Product }) {
             {product.name}
           </p>
           <span className="inline-flex items-center gap-1 text-xs text-amber-500">
-            <Star className="size-3 fill-current" /> 4.8
+            <Star className="size-3 fill-current" /> {product.rating}
           </span>
         </div>
 
         {/* Vendor + Unit */}
-        <div className="text-xs text-neutral-500">
-          {product.vendor} {product.unit ? `• ${product.unit}` : null}
+        <div className="text-md text-black-500">
+          <span className="font-semibold">
+          Seller:
+          </span>  
+              {product.vendor} {product.unit ? `• ${product.unit}` : null}
         </div>
 
         {/* Price + View Button */}

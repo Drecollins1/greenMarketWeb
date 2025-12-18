@@ -56,11 +56,12 @@ export default function IndexPage() {
         const formattedProducts: Product[] = productsArray.map((p: any) => ({
           id: p.id,
           name: p.title,
-          price: p.price_range?.min ?? "0",
+          price: p.price,
           unit: "",
           vendor: p.user?.name ?? p.business?.name,
           tag: p.sub,
           image: p.thumbnail ?? p.images?.[0] ?? "/placeholder.png",
+          rating: p.business.rating
         }));
 
         setProducts(formattedProducts);

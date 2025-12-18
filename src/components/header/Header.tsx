@@ -17,6 +17,7 @@ import {
 import Image from "next/image";
 import { FaAd, FaHeadset } from "react-icons/fa";
 import { TiUserAdd } from "react-icons/ti";
+import { logoutAuth } from "@/utils/auth"
 
 const navRoutes = [
   { label: "Home", href: "/" },
@@ -118,22 +119,15 @@ export default function Header({
   const checkAuthStatus = () => {
     // Check if user is logged in (you can modify this based on your auth logic)
     const token = sessionStorage.getItem('jwt');
-    const user = sessionStorage.getItem('user');
-    setIsLoggedIn(!!token || !!user);
+    setIsLoggedIn(!!token);
   };
 
   const handleLogout = () => {
-    // Clear auth data from sessionStorage
-    sessionStorage.removeItem('authToken');
-    sessionStorage.removeItem('user');
-    sessionStorage.removeItem('loginEmail');
-    
-    // Update state
-    setIsLoggedIn(false);
-    
-    // Redirect to home page
-    window.location.href = '/';
-  };
+      logoutAuth()
+      
+      // Redirect to home page
+      window.location.href = '/';
+    };
 
   return (
     <>

@@ -11,6 +11,7 @@ import Link from "next/link";
 import { formatWalletAmount, formatPrice } from "@/utils/func";
 import { getOffers } from "@/services/escrow";
 import Pagination from "@/components/Pagination";
+import { logoutAuth } from "@/utils/auth"
 
 // Types
 interface VendorProfile {
@@ -34,12 +35,101 @@ interface OrderData {
 }
 
 interface Order {
-  id: string;
-  customerName: string;
-  product: string;
-  amount: number;
-  status: "pending" | "processing" | "completed" | "cancelled";
-  date: string;
+  id?:               number;
+    userID?:           number;
+    reference?:        string;
+    quantity?:         number;
+    status?:           string;
+    meta?:             null;
+    paymentLink?:      string;
+    platform?:         string;
+    narration?:        null;
+    type?:             string;
+    channel?:          string;
+    amount?:           string;
+    amountPaid?:       number;
+    transactableType?: string;
+    transactableID?:   number;
+    paidAt?:           Date;
+    deletedAt?:        null;
+    createdAt?:        Date;
+    updatedAt?:        Date;
+    transactable?:     Transactable;
+    user?:             User;
+    description?:      string;
+    date?:             Date;
+    project?:          null;
+    product?:          Product;
+}
+
+export interface Transactable {
+    id?:              number;
+    buyerID?:         number;
+    sellerID?:        number;
+    status?:          string;
+    productID?:       string;
+    description?:     string;
+    amount?:          string;
+    reference?:       string;
+    isPaid?:          boolean;
+    paidAt?:          Date;
+    accountName?:     null;
+    accountNumber?:   null;
+    bankCode?:        null;
+    bankName?:        null;
+    isPaidOut?:       boolean;
+    payOutRequested?: number;
+    paidOutAt?:       null;
+    createdAt?:       Date;
+    updatedAt?:       Date;
+    initiator?:       null;
+    statusReason?:    null;
+    chatMessageID?:   null;
+    payable?:         number;
+    charge?:          number;
+    images?:          any[];
+}
+
+export interface Product {
+    id?:          number;
+    categoryID?:  number;
+    userID?:      number;
+    title?:       string;
+    slug?:        string;
+    tags?:        string;
+    description?: string;
+    state?:       string;
+    local?:       string;
+    nearest?:     string;
+    price?:       number;
+    useEscrow?:   number;
+    status?:      string;
+    images?:      string;
+    createdAt?:   Date;
+    updatedAt?:   Date;
+    views?:       number;
+}
+
+export interface User {
+    id?:              number;
+    name?:            string;
+    email?:           string;
+    phone?:           string;
+    type?:            string;
+    avatar?:          string;
+    banner?:          string;
+    business?:        null;
+    settings?:        null;
+    socials?:         null;
+    tags?:            null;
+    fcmToken?:        null;
+    emailVerifiedAt?: null;
+    providerName?:    null;
+    providerID?:      null;
+    rememberToken?:   null;
+    createdAt?:       Date;
+    updatedAt?:       Date;
+    deletedAt?:       null;
 }
 
 interface Message {
@@ -95,7 +185,6 @@ const Profile = () => {
   const [profileLoading, setProfileLoading] = useState(false);
   const [myOrders, setMyOrder] = useState(false);
   const [orders, setOrders] = useState<OrderData | null>(null);
-const [ordersLoading, setOrdersLoading] = useState(false);
 const [currentOrdersPage, setCurrentOrdersPage] = useState(1);
 const [ordersPerPage, setOrdersPerPage] = useState(10);
 const [ordersFilters, setOrdersFilters] = useState({
@@ -162,7 +251,7 @@ const [ordersFilters, setOrdersFilters] = useState({
   };
 
 const fetchOrdersData = async () => {
-    setOrdersLoading(true);
+    setLoading(true);
     try {
       const data = await getOrders(ordersFilters);
       if (data) {
@@ -171,7 +260,7 @@ const fetchOrdersData = async () => {
     } catch (error) {
       console.error("Failed to fetch orders:", error);
     } finally {
-      setOrdersLoading(false);
+      setLoading(false);
     }
   };
 
@@ -230,13 +319,13 @@ const fetchOrdersData = async () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "completed":
+      case "success":
         return "bg-green-100 text-green-800";
       case "processing":
         return "bg-blue-100 text-blue-800";
       case "pending":
         return "bg-yellow-100 text-yellow-800";
-      case "cancelled":
+      case "failed":
         return "bg-red-100 text-red-800";
       default:
         return "bg-gray-100 text-gray-800";
@@ -270,6 +359,13 @@ const fetchOrdersData = async () => {
       return userProfile.product_count;
     }
     return dashboardData?.products || 0;
+  };
+
+  const handleLogout = () => {
+    logoutAuth()
+    
+    // Redirect to home page
+    window.location.href = '/';
   };
 
   return (
@@ -418,7 +514,7 @@ const fetchOrdersData = async () => {
               >
                 Profile
               </button>
-              <button className="w-full text-left px-4 py-2.5 rounded-lg hover:bg-gray-50 text-red-600 transition-colors">
+              <button onClick={handleLogout} className="w-full text-left px-4 py-2.5 rounded-lg hover:bg-gray-50 text-red-600 transition-colors">
                 Log out
               </button>
             </nav>
@@ -459,12 +555,12 @@ const fetchOrdersData = async () => {
                             <p className="text-2xl sm:text-3xl font-bold text-green-700">
                               {dashboardData
                                 ? formatWalletAmount(dashboardData.wallet)
-                                : "$0.00"}
+                                : "0"}
                             </p>
                           </div>
                           <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-full flex items-center justify-center">
                             <span className="text-green-600 font-bold text-sm">
-                              $
+                              &#x20A6;
                             </span>
                           </div>
                         </div>
@@ -641,7 +737,7 @@ const fetchOrdersData = async () => {
                   </div>
                 </div>
 
-                {ordersLoading ? (
+                {loading ? (
                   <div className="flex justify-center items-center py-12">
                     <div className="w-8 h-8 border-4 border-[#39B54A] border-t-transparent rounded-full animate-spin"></div>
                   </div>
@@ -680,16 +776,16 @@ const fetchOrdersData = async () => {
                                   className="border-b border-neutral-200 hover:bg-gray-50"
                                 >
                                   <td className="p-3 sm:p-4 text-sm">
-                                    {order.order_number || order.id}
+                                    {order.id}
                                   </td>
                                   <td className="p-3 sm:p-4 text-sm">
-                                    {order.customer_name || "Unknown Customer"}
+                                    {order.user?.name}
                                   </td>
                                   <td className="p-3 sm:p-4 text-sm hidden md:table-cell">
-                                    {order.product_name || "Unknown Product"}
+                                    {order.product?.title}
                                   </td>
                                   <td className="p-3 sm:p-4 text-sm">
-                                    ${formatPrice(order.amount)}
+                                    {formatPrice(order.transactable?.amount)}
                                   </td>
                                   <td className="p-3 sm:p-4">
                                     <span

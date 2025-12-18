@@ -9,6 +9,8 @@ import Link from "next/link";
 import { getProductDetails } from "@/services/products";
 import { getCategories } from "@/services/category";
 import { getSimilarProducts } from "@/services/products";
+import ApiFetcher from "@/utils/apis";
+import ProductDetailsSkeleton from "@/components/skeletons/ProductDetailsSkeleton";
 
 type Category = {
   id: number;
@@ -51,108 +53,6 @@ type SimilarProductsResponse = {
   path?: string;
 };
 
-const ProductDetailsSkeleton = () => {
-  return (
-    <div className="container mx-auto max-w-7xl lg:px-0 px-4 py-10 animate-pulse">
-      {/* Top Section Skeleton */}
-      <div className="grid lg:grid-cols-[1fr_1.5fr_0.8fr] gap-8 mb-12">
-        {/* Left - Image Gallery Skeleton */}
-        <div>
-          <div className="relative aspect-square rounded-xl overflow-hidden bg-gray-200">
-            <div className="w-full h-full bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 animate-pulse"></div>
-          </div>
-          <div className="flex gap-3 mt-4">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="w-20 h-20 rounded-md bg-gray-200 animate-pulse"></div>
-            ))}
-          </div>
-        </div>
-
-        {/* Middle - Product Info Skeleton */}
-        <div className="flex flex-col justify-start space-y-4">
-          <div className="w-24 h-6 bg-gray-200 rounded-full animate-pulse"></div>
-          <div className="w-3/4 h-8 bg-gray-200 rounded animate-pulse"></div>
-          <div className="w-32 h-6 bg-gray-200 rounded animate-pulse"></div>
-          <div className="w-24 h-8 bg-gray-200 rounded animate-pulse"></div>
-
-          {/* Description Skeleton */}
-          <div className="space-y-2">
-            <div className="w-full h-4 bg-gray-200 rounded animate-pulse"></div>
-            <div className="w-4/5 h-4 bg-gray-200 rounded animate-pulse"></div>
-            <div className="w-3/4 h-4 bg-gray-200 rounded animate-pulse"></div>
-          </div>
-
-          {/* Quantity + Buttons Skeleton */}
-          <div className="flex flex-wrap items-center gap-3 pt-4">
-            <div className="w-24 h-10 bg-gray-200 rounded-md animate-pulse"></div>
-            <div className="w-32 h-10 bg-gray-200 rounded-md animate-pulse"></div>
-            <div className="w-36 h-10 bg-gray-200 rounded-md animate-pulse"></div>
-          </div>
-
-          {/* Store Info Card Skeleton */}
-          <div className="mt-6 bg-gray-50 border border-gray-200 rounded-lg p-4">
-            <div className="w-32 h-5 bg-gray-200 rounded animate-pulse mb-3"></div>
-            <div className="space-y-2">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="w-3/4 h-4 bg-gray-200 rounded animate-pulse"></div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Right - Categories Skeleton */}
-        <div className="bg-white shadow-sm border border-neutral-200 rounded-xl p-4 h-fit">
-          <div className="w-32 h-6 bg-gray-200 rounded animate-pulse mb-3"></div>
-          <div className="space-y-2">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded-md">
-                <div className="w-24 h-4 bg-gray-200 rounded animate-pulse"></div>
-                <div className="w-8 h-4 bg-gray-200 rounded-full animate-pulse"></div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Tabs Section Skeleton */}
-      <div className="mt-10 border border-neutral-200 rounded-lg bg-white">
-        <div className="flex border-b">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="px-5 py-3">
-              <div className="w-20 h-4 bg-gray-200 rounded animate-pulse"></div>
-            </div>
-          ))}
-        </div>
-        <div className="p-6">
-          <div className="space-y-2">
-            <div className="w-48 h-5 bg-gray-200 rounded animate-pulse"></div>
-            <div className="space-y-1 ml-6">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="w-3/4 h-4 bg-gray-200 rounded animate-pulse"></div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Related Products Skeleton */}
-      <div className="mt-12">
-        <div className="w-48 h-6 bg-gray-200 rounded animate-pulse mb-4"></div>
-        <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-5">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="border border-neutral-200 rounded-xl overflow-hidden">
-              <div className="w-full h-48 bg-gray-200 animate-pulse"></div>
-              <div className="p-3 space-y-2">
-                <div className="w-3/4 h-4 bg-gray-200 rounded animate-pulse"></div>
-                <div className="w-16 h-4 bg-gray-200 rounded animate-pulse"></div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-};
 
 // Pulse loader for smaller loading states
 const PulseLoader = ({ size = "md" }: { size?: "sm" | "md" | "lg" }) => {
@@ -358,6 +258,10 @@ export default function ProductDetails() {
     return <ProductDetailsSkeleton />;
   }
 
+  const handleRequestEscrow = () => {
+    
+  }
+
   return (
     <div className="container mx-auto max-w-7xl lg:px-0 px-4 py-10">
       {/* TOP SECTION */}
@@ -453,7 +357,8 @@ export default function ProductDetails() {
             <Link href={"/message"} className="rounded-md bg-green-600 px-4 py-2 text-white hover:bg-green-700 flex items-center gap-2 text-sm">
               <BsChatLeftText size={18} /> Chat Seller
             </Link>
-            <button className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 flex items-center gap-2 text-sm">
+            
+            <button onClick={handleRequestEscrow} className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 flex items-center gap-2 text-sm">
               <FaMoneyBillTransfer size={18} /> Request Escrow
             </button>
           </div>
