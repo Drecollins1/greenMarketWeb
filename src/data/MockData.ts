@@ -1,3 +1,23 @@
+// MockData.ts
+
+export interface Message {
+  id: string;
+  from: string;
+  subject: string;
+  preview: string;
+  date: string;
+  unread: boolean;
+}
+
+export interface Order {
+  id: string;
+  customerName: string;
+  product: string;
+  amount: number;
+  status: "completed" | "processing" | "pending";
+  date: string;
+}
+
 export const messageData: Message[] = [
   {
     id: "MSG-001",

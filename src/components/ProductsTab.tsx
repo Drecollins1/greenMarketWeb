@@ -17,15 +17,15 @@ const ProductsTab: React.FC<Props> = ({ products, isLoading }) => {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {products?.data?.map((product) => (
-            <div key={product._id} className="p-4 border rounded-lg">
+            <div key={product.id} className="p-4 border rounded-lg">
               <Image
                 src={product.images?.[0]}
                 className="h-32 w-full object-cover rounded-lg"
                 width={60}
                 height={60}
-                alt={product.name}
+                alt={product.title}
               />
-              <h3 className="mt-2 font-medium">{product.name}</h3>
+              <h3 className="mt-2 font-medium">{product.title}</h3>
               <p className="text-sm text-gray-600">{product.category}</p>
             </div>
           )) || "No products"}

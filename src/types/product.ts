@@ -7,6 +7,7 @@ export interface Product {
   slug: string;
   tags: string[];
   description: string;
+  category:string;
   state: string;
   local: string | null;
   nearest: string;
@@ -78,4 +79,15 @@ export interface GetProductsRequest {
 export interface GetProductsResponse {
   data: ProductData;
 }
+
+export type UIProduct = {
+  id: number;
+  name: string;
+  price: number;
+  image: string;
+  vendor: string;
+  rating: number;
+  tag?: string;
+  unit?: string;
+};
 

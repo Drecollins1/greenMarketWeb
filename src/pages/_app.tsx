@@ -348,7 +348,9 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
 export default function App({ Component, pageProps }: AppProps) {
   const [catOpen, setCatOpen] = useState(false);
   const router = useRouter();
-  const isAdminRoute = router.pathname.startsWith("/admin");
+  // const isAdminRoute = router.pathname.startsWith("/admin");
+  const isAdminRoute = router.pathname?.startsWith("/admin") ?? false;
+
 
   return (
     <>

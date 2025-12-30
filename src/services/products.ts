@@ -3,12 +3,26 @@ import { toast } from "react-toastify";
 import { GetProductsRequest, GetProductsResponse, ProductData } from "@/types/product";
 
 // GET ALL PRODUCTS
-export const getProducts = async (): Promise<GetProductsResponse | null> => {
+export const getProducts = async (
+  params: GetProductsRequest = {}
+): Promise<ProductData | null> => {  // Change return type
   try {
-    const response = await ApiFetcher.get<GetProductsResponse>(`/products`);
+    const query = new URLSearchParams(
+      Object.entries(params).reduce((acc, [key, value]) => {
+        if (value !== undefined && value !== null) {
+          acc[key] = String(value);
+        }
+        return acc;
+      }, {} as Record<string, string>)
+    ).toString();
 
+    const response = await ApiFetcher.get<ProductData>(  // Change generic type
+      `/products?${query}`
+    );
+
+    // Check if response exists
     if (response?.data) {
-      return response.data; 
+      return response.data;  // Return response.data directly
     }
 
     toast.error("Failed to load Products");
@@ -23,7 +37,7 @@ export const getProducts = async (): Promise<GetProductsResponse | null> => {
 // GET MY PRODUCTS
 export const getMyProducts = async (
   page: number = 1, 
-  per_page: number = 10
+  per_page: number = 12
 ): Promise<ProductData | null> => {
   try {
     const response = await ApiFetcher.get<ProductData>(

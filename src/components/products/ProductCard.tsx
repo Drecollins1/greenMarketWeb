@@ -8,11 +8,11 @@ export type Product = {
   id: number;
   name: string;
   tag?: string;
-  price: string;
+  price: number;          
   unit?: string;
   vendor?: string;
   image: string;
-  rating: string;
+  rating: number;        
 };
 
 export default function ProductCard({ product }: { product: Product }) {
@@ -26,6 +26,7 @@ export default function ProductCard({ product }: { product: Product }) {
           fill
           className="object-cover transition-transform group-hover:scale-105"
         />
+
         {product.tag ? (
           <span className="absolute left-2 top-2 rounded-full bg-[#39B54A] px-2 py-0.5 text-xs text-white">
             {product.tag}
@@ -40,26 +41,28 @@ export default function ProductCard({ product }: { product: Product }) {
           <p className="line-clamp-2 text-sm font-medium text-neutral-800">
             {product.name}
           </p>
+
           <span className="inline-flex items-center gap-1 text-xs text-amber-500">
-            <Star className="size-3 fill-current" /> {product.rating}
+            <Star className="size-3 fill-current" />
+            {product.rating.toFixed(1)}
           </span>
         </div>
 
-        {/* Vendor + Unit */}
+        {/* Vendor */}
         <div className="text-md text-black-500">
+          <span className="font-semibold">Seller: </span>
           <span className="font-semibold">
-          Seller:
-          </span>  
-              {product.vendor} {product.unit ? `• ${product.unit}` : null}
+            {product.vendor}
+            {product.unit ? ` • ${product.unit}` : null}
+          </span>
         </div>
 
-        {/* Price + View Button */}
+        {/* Price + View */}
         <div className="flex justify-between items-center gap-2">
           <div className="text-sm font-semibold text-[#E4130C]">
-            &#8358;{product.price}
+            &#8358;{product.price.toLocaleString()}
           </div>
 
-          {/* VIEW BUTTON AS LINK */}
           <Link
             href={`/product/${product.id}`}
             className="inline-flex items-center gap-2 rounded-md bg-[#39B54A] px-3 py-1.5 text-sm text-white hover:bg-emerald-700 transition-colors"

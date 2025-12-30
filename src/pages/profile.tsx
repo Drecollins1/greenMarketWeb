@@ -12,6 +12,7 @@ import { formatWalletAmount, formatPrice } from "@/utils/func";
 import { getOffers } from "@/services/escrow";
 import Pagination from "@/components/Pagination";
 import { logoutAuth } from "@/utils/auth"
+import { GetOrdersResponse } from "@/types/orders";
 
 // Types
 interface VendorProfile {
@@ -21,115 +22,6 @@ interface VendorProfile {
   shopUrl: string;
   phoneNumber: string;
   email: string;
-}
-
-interface OrderData {
-  current_page: number;
-  data: Order[];
-  from: number | null;
-  last_page: number;
-  path: string;
-  per_page: number;
-  to: number | null;
-  total: number;
-}
-
-interface Order {
-  id?:               number;
-    userID?:           number;
-    reference?:        string;
-    quantity?:         number;
-    status?:           string;
-    meta?:             null;
-    paymentLink?:      string;
-    platform?:         string;
-    narration?:        null;
-    type?:             string;
-    channel?:          string;
-    amount?:           string;
-    amountPaid?:       number;
-    transactableType?: string;
-    transactableID?:   number;
-    paidAt?:           Date;
-    deletedAt?:        null;
-    createdAt?:        Date;
-    updatedAt?:        Date;
-    transactable?:     Transactable;
-    user?:             User;
-    description?:      string;
-    date?:             Date;
-    project?:          null;
-    product?:          Product;
-}
-
-export interface Transactable {
-    id?:              number;
-    buyerID?:         number;
-    sellerID?:        number;
-    status?:          string;
-    productID?:       string;
-    description?:     string;
-    amount?:          string;
-    reference?:       string;
-    isPaid?:          boolean;
-    paidAt?:          Date;
-    accountName?:     null;
-    accountNumber?:   null;
-    bankCode?:        null;
-    bankName?:        null;
-    isPaidOut?:       boolean;
-    payOutRequested?: number;
-    paidOutAt?:       null;
-    createdAt?:       Date;
-    updatedAt?:       Date;
-    initiator?:       null;
-    statusReason?:    null;
-    chatMessageID?:   null;
-    payable?:         number;
-    charge?:          number;
-    images?:          any[];
-}
-
-export interface Product {
-    id?:          number;
-    categoryID?:  number;
-    userID?:      number;
-    title?:       string;
-    slug?:        string;
-    tags?:        string;
-    description?: string;
-    state?:       string;
-    local?:       string;
-    nearest?:     string;
-    price?:       number;
-    useEscrow?:   number;
-    status?:      string;
-    images?:      string;
-    createdAt?:   Date;
-    updatedAt?:   Date;
-    views?:       number;
-}
-
-export interface User {
-    id?:              number;
-    name?:            string;
-    email?:           string;
-    phone?:           string;
-    type?:            string;
-    avatar?:          string;
-    banner?:          string;
-    business?:        null;
-    settings?:        null;
-    socials?:         null;
-    tags?:            null;
-    fcmToken?:        null;
-    emailVerifiedAt?: null;
-    providerName?:    null;
-    providerID?:      null;
-    rememberToken?:   null;
-    createdAt?:       Date;
-    updatedAt?:       Date;
-    deletedAt?:       null;
 }
 
 interface Message {
@@ -184,7 +76,7 @@ const Profile = () => {
   const [loading, setLoading] = useState(false);
   const [profileLoading, setProfileLoading] = useState(false);
   const [myOrders, setMyOrder] = useState(false);
-  const [orders, setOrders] = useState<OrderData | null>(null);
+  const [orders, setOrders] = useState<GetOrdersResponse | null>(null);
 const [currentOrdersPage, setCurrentOrdersPage] = useState(1);
 const [ordersPerPage, setOrdersPerPage] = useState(10);
 const [ordersFilters, setOrdersFilters] = useState({
@@ -253,9 +145,9 @@ const [ordersFilters, setOrdersFilters] = useState({
 const fetchOrdersData = async () => {
     setLoading(true);
     try {
-      const data = await getOrders(ordersFilters);
-      if (data) {
-        setOrders(data);
+      const res = await getOrders(ordersFilters);
+      if (res) {
+        setOrders(res);
       }
     } catch (error) {
       console.error("Failed to fetch orders:", error);
@@ -785,19 +677,16 @@ const fetchOrdersData = async () => {
                                     {order.product?.title}
                                   </td>
                                   <td className="p-3 sm:p-4 text-sm">
-                                    {formatPrice(order.transactable?.amount)}
+                                    {formatPrice(Number(order.transactable?.amount ?? 0))}
                                   </td>
                                   <td className="p-3 sm:p-4">
                                     <span
-                                      className={`text-xs px-2 sm:px-3 py-1 rounded-full whitespace-nowrap ${getStatusColor(
-                                        order.status
-                                      )}`}
-                                    >
+                                      className={`text-xs px-2 sm:px-3 py-1 rounded-full whitespace-nowrap ${getStatusColor(order.status ?? "pending")}`}>
                                       {order.status}
                                     </span>
                                   </td>
                                   <td className="p-3 sm:p-4 text-gray-600 text-sm hidden lg:table-cell">
-                                    {formatDate(order.created_at)}
+                                    {order.created_at && formatDate(order.created_at)}
                                   </td>
                                 </tr>
                               ))

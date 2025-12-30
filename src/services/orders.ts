@@ -1,7 +1,7 @@
 // api/orders.ts
 import ApiFetcher from "@/utils/apis";
 import { toast } from "react-toastify";
-import { GetOrdersRequest, GetOrdersResponse, Order } from "../types/orders";
+import { GetOrdersRequest, GetOrdersResponse, } from "../types/orders";
 
 // GET ALL ORDERS (with optional parameters)
 export const getOrders = async (
@@ -26,9 +26,9 @@ export const getOrders = async (
 };
 
 // GET SINGLE ORDER
-export const getOrder = async (orderId: string): Promise<Order | null> => {
+export const getOrderID = async (orderId: string): Promise<GetOrdersResponse | null> => {
   try {
-    const response = await ApiFetcher.get<{ data: Order }>(`/orders/${orderId}`);
+    const response = await ApiFetcher.get<{ data: GetOrdersResponse }>(`/orders/${orderId}`);
     
     if (response?.data?.data) {
       return response.data.data;
@@ -47,9 +47,9 @@ export const getOrder = async (orderId: string): Promise<Order | null> => {
 export const updateOrderStatus = async (
   orderId: string, 
   status: string
-): Promise<Order | null> => {
+): Promise<GetOrdersResponse | null> => {
   try {
-    const response = await ApiFetcher.patch<{ data: Order }>(
+    const response = await ApiFetcher.patch<{ data: GetOrdersResponse }>(
       `/orders/${orderId}/status`,
       { status }
     );
