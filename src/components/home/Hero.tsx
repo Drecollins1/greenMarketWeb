@@ -153,7 +153,7 @@ export default function Hero() {
 
                 {/* Conditional Layout: Centered or Left-Right */}
                 {slide.centered ? (
-                  <div className="relative z-10 flex flex-col items-center justify-center text-center p-6 md:py-16 lg:px-20 h-screen">
+                  <div className="relative z-10 flex flex-col items-center justify-center text-center p-6 md:py-16 lg:px-20">
                     <div className="max-w-3xl">
                       <h1
                         className={`text-3xl md:text-5xl font-bold ${

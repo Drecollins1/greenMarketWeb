@@ -77,7 +77,7 @@ function SearchBar({ className = "" }: { className?: string }) {
         </button>
         {/* Location Dropdown */}
         {locationOpen && (
-          <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-neutral-200 rounded-md shadow-lg z-9999">
+          <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-neutral-200 rounded-md shadow-lg z-100">
             {locations.map((loc) => (
               <button
                 key={loc.value}
