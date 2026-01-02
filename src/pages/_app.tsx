@@ -4,7 +4,15 @@ import { useRouter } from "next/router";
 import Header from "@/components/header/Header";
 import Footer from "@/components/Footer";
 import Image from "next/image";
-import { ChevronRight, Tags, Leaf, Rss, UsersRound } from "lucide-react";
+import {
+  ChevronRight,
+  Tags,
+  Leaf,
+  Rss,
+  UsersRound,
+  CalendarClock,
+  UserPlus,
+} from "lucide-react";
 import "@/styles/globals.css";
 import Link from "next/link";
 import {
@@ -183,6 +191,18 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
           href: "/admin/community",
           badge: null,
         },
+        {
+          icon: CalendarClock,
+          label: "Events",
+          href: "/admin/events",
+          badge: null,
+        },
+        {
+          icon: UserPlus,
+          label: "Referrals",
+          href: "/admin/referrals",
+          badge: null,
+        },
       ],
     },
     {
@@ -325,21 +345,6 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
                 <FaBars className="text-3xl" />
               </button>
             </div>
-
-            {/* <div className="flex-1 lg:flex-none"></div> */}
-
-            {/* <div className="flex items-center gap-4">
-              <button className="relative p-2 text-gray-500 hover:text-gray-700">
-                <FaBell className="w-6 h-6" />
-                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-              </button>
-              
-            </div> */}
-          </div>
-          <div className="flex justify-end">
-            <button className="hidden sm:block px-4 py-2 bg-green-500 text-white text-sm font-medium rounded-lg hover:bg-green-600 transition-colors">
-              Add Product
-            </button>
           </div>
         </header>
 

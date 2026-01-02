@@ -8,6 +8,7 @@ import {
   Menu,
   X,
   UserPlus,
+  ArrowRightLeft,
 } from "lucide-react";
 import { FaChevronRight } from "react-icons/fa6";
 import EscrowRequests from "@/components/EscrowOrders";
@@ -294,7 +295,7 @@ const Profile = () => {
             {/* Mobile menu button */}
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="lg:hidden p-2 rounded-lg hover:bg-gray-100"
+              className="lg:hidden p-2 rounded-lg  hover:bg-gray-100"
             >
               {sidebarOpen ? (
                 <X className="w-6 h-6" />
@@ -311,7 +312,7 @@ const Profile = () => {
           {/* Sidebar - Mobile Overlay */}
           {sidebarOpen && (
             <div
-              className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
+              className="fixed inset-0  bg-opacity-50 lg:hidden"
               onClick={() => setSidebarOpen(false)}
             />
           )}
@@ -319,7 +320,7 @@ const Profile = () => {
           {/* Sidebar */}
           <div
             className={`
-            fixed lg:relative inset-y-0 left-0 z-30 w-72 bg-white rounded-lg shadow-sm p-6
+            fixed lg:relative inset-y-0 left-0 z-9999 lg:z-30 w-72  bg-white rounded-lg shadow-sm p-6
             transform transition-transform duration-300 ease-in-out
             ${
               sidebarOpen
@@ -424,7 +425,6 @@ const Profile = () => {
                 }`}
               >
                 <span>Referrals</span>
-               
               </button>
               <button
                 onClick={() => handleTabChange("profile")}
@@ -502,7 +502,7 @@ const Profile = () => {
                               {getActualProductCount()}
                             </p>
                           </div>
-                          <Package className="w-8 h-8 sm:w-10 sm:h-10 text-[#39B54A]" />
+                          <ShoppingCart className="w-8 h-8 sm:w-10 sm:h-10 text-[#39B54A]" />
                         </div>
                       </div>
 
@@ -517,7 +517,7 @@ const Profile = () => {
                               {dashboardData?.escrow ?? 0}
                             </p>
                           </div>
-                          <ShoppingCart className="w-8 h-8 sm:w-10 sm:h-10 text-purple-600" />
+                          <ArrowRightLeft className="w-8 h-8 sm:w-10 sm:h-10 text-purple-600" />
                         </div>
                       </div>
 

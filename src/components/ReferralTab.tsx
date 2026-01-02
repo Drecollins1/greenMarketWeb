@@ -1,7 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Copy, Share2, Gift, Users, X, Wallet, ArrowRight, Info, CheckCircle } from "lucide-react";
+import {
+  Copy,
+  Share2,
+  Gift,
+  Users,
+  X,
+  Wallet,
+  ArrowRight,
+  Info,
+  CheckCircle,
+} from "lucide-react";
 
 interface ReferralHistory {
   id: number;
@@ -23,7 +33,7 @@ const ReferralTab = () => {
   const [referralData, setReferralData] = useState<ReferralData | null>(null);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isCopied, setIsCopied] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
 
   // Form states
   const [bankName, setBankName] = useState("");
@@ -122,7 +132,9 @@ const ReferralTab = () => {
     }
 
     alert(
-      `Withdrawal request submitted!\nPoints: ${withdrawAmount}\nAmount: ₦${cashEquivalent.toFixed(2)}\nBank: ${bankName}\nAccount: ${accountNumber} (${accountName})`
+      `Withdrawal request submitted!\nPoints: ${withdrawAmount}\nAmount: ₦${cashEquivalent.toFixed(
+        2
+      )}\nBank: ${bankName}\nAccount: ${accountNumber} (${accountName})`
     );
     setIsModalOpen(false);
 
@@ -182,7 +194,7 @@ const ReferralTab = () => {
       </div>
 
       {/* Referral Link */}
-         {/* Referral Link */}
+      {/* Referral Link */}
       <div className="bg-gray-50 p-6 rounded-lg mb-8">
         <h3 className="text-lg font-semibold mb-3">Your Referral Link</h3>
         <div className="flex flex-col sm:flex-row gap-3">
@@ -192,7 +204,7 @@ const ReferralTab = () => {
             readOnly
             className="flex-1 outline-none px-4 py-2 border border-neutral-200 rounded-lg bg-white text-sm font-mono"
           />
-          
+
           {/* Modern Copy Button */}
           <button
             onClick={async () => {
@@ -203,12 +215,24 @@ const ReferralTab = () => {
             }}
             className="relative flex items-center justify-center gap-2 px-6 py-2 bg-[#39B54A] text-white rounded-lg hover:bg-[#2d8f3a] transition-all duration-200 font-medium overflow-hidden"
           >
-            <span className={`flex items-center gap-2 transition-all duration-300 ${isCopied ? 'translate-x-8 opacity-0' : 'translate-x-0 opacity-100'}`}>
+            <span
+              className={`flex items-center gap-2 transition-all duration-300 ${
+                isCopied
+                  ? "translate-x-8 opacity-0"
+                  : "translate-x-0 opacity-100"
+              }`}
+            >
               <Copy className="w-4 h-4" />
               Copy
             </span>
 
-            <span className={`absolute flex items-center gap-2 transition-all duration-300 ${isCopied ? 'translate-x-0 opacity-100' : '-translate-x-8 opacity-0'}`}>
+            <span
+              className={`absolute flex items-center gap-2 transition-all duration-300 ${
+                isCopied
+                  ? "translate-x-0 opacity-100"
+                  : "-translate-x-8 opacity-0"
+              }`}
+            >
               <CheckCircle className="w-4 h-4" />
               Copied!
             </span>
@@ -225,7 +249,8 @@ const ReferralTab = () => {
         </div>
 
         <p className="text-sm text-gray-600 mt-3">
-          Share this link with friends — earn points when they sign up and complete actions.
+          Share this link with friends — earn points when they sign up and
+          complete actions.
         </p>
       </div>
 
@@ -299,18 +324,18 @@ const ReferralTab = () => {
       )}
 
       {isModalOpen && (
-        <div 
-          className="fixed inset-0 bg-black/50 flex items-center justify-center px-4 z-9999 backdrop-blur supports-backdrop-filter:bg-white/0 border-b border-neutral-200"
+        <div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center px-4  z-9999 backdrop-blur supports-backdrop-filter:bg-white/60 border-b border-neutral-200"
           onClick={() => setIsModalOpen(false)}
         >
-          <div 
+          <div
             className="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[95vh] overflow-hidden flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Header with gradient */}
+            {/* Header */}
             <div className="bg-gradient-to-r from-[#39B54A] to-[#2d8f3a] p-6 text-white">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-2xl font-bold">Withdrawal</h3>
+                <h3 className="text-2xl font-bold">Withdraw Rewards</h3>
                 <button
                   onClick={() => setIsModalOpen(false)}
                   className="p-2 hover:bg-white/20 rounded-full transition"
@@ -319,12 +344,15 @@ const ReferralTab = () => {
                 </button>
               </div>
 
-              {/* Balance Card */}
               <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-white/80 text-sm mb-1">Available Balance</p>
-                    <p className="text-3xl font-bold">{referralData.points}</p>
+                    <p className="text-white/80 text-sm mb-1">
+                      Available Balance
+                    </p>
+                    <p className="text-3xl font-bold">
+                      {referralData.points.toLocaleString()}
+                    </p>
                     <p className="text-white/60 text-xs mt-1">Reward Points</p>
                   </div>
                   <Wallet className="w-12 h-12 text-white/30" />
@@ -332,143 +360,221 @@ const ReferralTab = () => {
               </div>
             </div>
 
-            {/* Scrollable Form Content */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-5">
+            {/* Body */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+              {/* Minimum Notice */}
+              {referralData.points < 2000 ? (
+                <div className="bg-amber-50 border-2 border-amber-300 rounded-xl p-5 text-center">
+                  <Info className="w-10 h-10 text-amber-600 mx-auto mb-3" />
+                  <p className="font-bold text-amber-900 text-lg mb-2">
+                    Minimum Withdrawal: 2,000 points (₦200)
+                  </p>
+                  <p className="text-amber-800">
+                    You currently have{" "}
+                    <strong>{referralData.points.toLocaleString()}</strong>{" "}
+                    points.
+                  </p>
+                  <p className="text-sm text-amber-700 mt-2">
+                    Keep referring friends — you're almost there!
+                  </p>
+                </div>
+              ) : (
+                <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex gap-3">
+                  <CheckCircle className="w-6 h-6 text-emerald-600 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-semibold text-emerald-900">
+                      You're eligible to withdraw!
+                    </p>
+                    <p className="text-sm text-emerald-700">
+                      Enter your bank details below
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {/* Amount Input */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Withdrawal Amount
+                  Withdrawal Amount (points)
                 </label>
                 <div className="relative">
                   <input
                     type="number"
                     value={withdrawAmount}
-                    onChange={(e) => setWithdrawAmount(e.target.value)}
-                    placeholder="Enter points to withdraw"
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (
+                        val === "" ||
+                        (/^\d+$/.test(val) &&
+                          Number(val) <= referralData.points)
+                      ) {
+                        setWithdrawAmount(val);
+                      }
+                    }}
+                    placeholder={
+                      referralData.points < 2000
+                        ? "Minimum 2000"
+                        : "Enter amount"
+                    }
+                    min="2000"
                     max={referralData.points}
-                    min="0"
-                    className="w-full outline-none px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39B54A] focus:border-[#39B54A] text-lg font-medium [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    disabled={referralData.points < 2000}
+                    className="w-full outline-none px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39B54A] focus:border-[#39B54A] text-lg font-medium disabled:bg-gray-100 disabled:text-gray-500"
                   />
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-medium">
                     Points
                   </div>
                 </div>
-                
-                {/* Conversion Display */}
-                {withdrawAmount && (
-                  <div className="mt-3 flex items-center justify-between bg-emerald-50 p-3 rounded-lg border border-emerald-200">
-                    <span className="text-sm text-gray-600">You will receive:</span>
-                    <span className="text-lg font-bold text-[#39B54A]">
-                      ₦{cashEquivalent.toFixed(2)}
+
+                {/* Cash Equivalent */}
+                {withdrawAmount && Number(withdrawAmount) >= 2000 && (
+                  <div className="mt-3 flex items-center justify-between bg-emerald-50 p-4 rounded-lg border border-emerald-200">
+                    <span className="text-sm font-medium text-gray-700">
+                      You will receive:
+                    </span>
+                    <span className="text-2xl font-bold text-[#39B54A]">
+                      ₦{cashEquivalent.toFixed(0)}
                     </span>
                   </div>
                 )}
-                
-                {/* Quick Amount Buttons */}
-                <div className="flex gap-2 mt-3">
-                  {[25, 50, 75, 100].map((percentage) => {
-                    const amount = Math.floor((referralData.points * percentage) / 100);
+
+                {/* Quick Buttons */}
+                <div className="grid grid-cols-2 gap-3 mt-4">
+                  {[
+                    { label: "2,000 pts", value: 2000 },
+                    { label: "5,000 pts", value: 5000 },
+                    { label: "10,000 pts", value: 10000 },
+                    { label: "All Points", value: referralData.points },
+                  ].map((btn) => {
+                    const isDisabled =
+                      btn.value < 2000 ||
+                      btn.value > referralData.points ||
+                      referralData.points < 2000;
+
                     return (
                       <button
-                        key={percentage}
-                        onClick={() => setWithdrawAmount(amount.toString())}
-                        className="flex-1 px-3 py-2 bg-gray-100 hover:bg-[#39B54A] hover:text-white rounded-lg text-sm font-medium transition"
+                        key={btn.label}
+                        disabled={isDisabled}
+                        onClick={() => setWithdrawAmount(btn.value.toString())}
+                        className={`py-3 rounded-lg font-medium transition ${
+                          isDisabled
+                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                            : "bg-gray-100 hover:bg-[#39B54A] hover:text-white text-gray-700"
+                        }`}
                       >
-                        {percentage}%
+                        {btn.label}
                       </button>
                     );
                   })}
                 </div>
               </div>
 
-              {/* Bank Selection */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Select Bank
-                </label>
-                <select
-                  value={bankName}
-                  onChange={(e) => setBankName(e.target.value)}
-                  className="w-full outline-none px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39B54A] focus:border-[#39B54A] bg-white appearance-none"
-                >
-                  <option value="">Choose your bank</option>
-                  <option>Access Bank</option>
-                  <option>GTBank</option>
-                  <option>First Bank</option>
-                  <option>Zenith Bank</option>
-                  <option>UBA</option>
-                  <option>Fidelity Bank</option>
-                  <option>Kuda Bank</option>
-                  <option>Opay</option>
-                  <option>Palmpay</option>
-                </select>
-              </div>
+              {/* Bank Form — Always visible */}
+              <div className={referralData.points < 2000 ? "opacity-60" : ""}>
+                <div className="space-y-5">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Select Bank
+                    </label>
+                    <select
+                      value={bankName}
+                      onChange={(e) => setBankName(e.target.value)}
+                      disabled={referralData.points < 2000}
+                      className="w-full outline-none px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39B54A] focus:border-[#39B54A] bg-white disabled:bg-gray-100"
+                    >
+                      <option value="">Choose your bank</option>
+                      <option>Access Bank</option>
+                      <option>GTBank</option>
+                      <option>First Bank</option>
+                      <option>Zenith Bank</option>
+                      <option>UBA</option>
+                      <option>Fidelity Bank</option>
+                      <option>Kuda Bank</option>
+                      <option>Opay</option>
+                      <option>Palmpay</option>
+                    </select>
+                  </div>
 
-              {/* Account Number */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Account Number
-                </label>
-                <input
-                  type="text"
-                  value={accountNumber}
-                  onChange={(e) => {
-                    const value = e.target.value.replace(/\D/g, '').slice(0, 10);
-                    setAccountNumber(value);
-                  }}
-                  placeholder="10-digit account number"
-                  maxLength={10}
-                  className="w-full outline-none px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39B54A] focus:border-[#39B54A]"
-                />
-              </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Account Number
+                    </label>
+                    <input
+                      type="text"
+                      value={accountNumber}
+                      onChange={(e) => {
+                        const value = e.target.value
+                          .replace(/\D/g, "")
+                          .slice(0, 10);
+                        setAccountNumber(value);
+                      }}
+                      placeholder="10-digit account number"
+                      maxLength={10}
+                      disabled={referralData.points < 2000}
+                      className="w-full outline-none px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39B54A] focus:border-[#39B54A] disabled:bg-gray-100"
+                    />
+                  </div>
 
-              {/* Account Name */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Account Name
-                </label>
-                <input
-                  type="text"
-                  value={accountName}
-                  onChange={(e) => setAccountName(e.target.value)}
-                  placeholder="Full name as on bank account"
-                  className="w-full outline-none px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39B54A] focus:border-[#39B54A]"
-                />
-              </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Account Name
+                    </label>
+                    <input
+                      type="text"
+                      value={accountName}
+                      onChange={(e) => setAccountName(e.target.value)}
+                      placeholder="Full name as on bank account"
+                      disabled={referralData.points < 2000}
+                      className="w-full outline-none px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39B54A] focus:border-[#39B54A] disabled:bg-gray-100"
+                    />
+                  </div>
 
-              {/* PIN Input */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Transaction PIN
-                </label>
-                <input
-                  type="password"
-                  value={pin}
-                  onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                  placeholder="Enter 4-digit PIN"
-                  maxLength={4}
-                  className="w-full outline-none px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39B54A] focus:border-[#39B54A] text-center text-lg tracking-[0.5em] font-bold"
-                />
-              </div>
-
-              {/* Info Box */}
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex gap-3">
-                <Info className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
-                <div className="text-sm text-blue-800">
-                  <p className="font-medium mb-1">Processing Time</p>
-                  <p className="text-blue-600">Withdrawals are processed within 24-48 hours on business days.</p>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Transaction PIN
+                    </label>
+                    <input
+                      type="password"
+                      value={pin}
+                      onChange={(e) =>
+                        setPin(e.target.value.replace(/\D/g, "").slice(0, 4))
+                      }
+                      placeholder="••••"
+                      maxLength={4}
+                      disabled={referralData.points < 2000}
+                      className="w-full outline-none px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#39B54A] focus:border-[#39B54A] text-center text-2xl tracking-widest font-bold disabled:bg-gray-100"
+                    />
+                  </div>
                 </div>
+
+                {referralData.points < 2000 && (
+                  <p className="text-center text-sm text-gray-500 mt-4">
+                    Fill in your bank details now — they'll be saved for when
+                    you reach 2,000 points!
+                  </p>
+                )}
               </div>
             </div>
 
-            {/* Footer with Action Button */}
+            {/* Footer */}
             <div className="p-6 border-t border-gray-200 bg-gray-50">
               <button
                 onClick={handleWithdrawRequest}
-                disabled={!bankName || !accountNumber || !accountName || !withdrawAmount || !pin}
-                className="w-full py-4 bg-linear-to-r from-[#39B54A] to-[#2d8f3a] text-white rounded-xl font-bold text-lg hover:shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                disabled={
+                  referralData.points < 2000 ||
+                  !withdrawAmount ||
+                  Number(withdrawAmount) < 2000 ||
+                  Number(withdrawAmount) > referralData.points ||
+                  !bankName ||
+                  !accountNumber ||
+                  !accountName ||
+                  !pin
+                }
+                className="w-full py-4 bg-gradient-to-r from-[#39B54A] to-[#2d8f3a] text-white rounded-xl font-bold text-lg hover:shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
               >
-                Confirm Withdrawal
+                {referralData.points < 2000
+                  ? "Not Eligible Yet"
+                  : "Confirm Withdrawal"}
                 <ArrowRight className="w-5 h-5" />
               </button>
             </div>

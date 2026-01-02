@@ -178,7 +178,7 @@ export default function AdminBlogsPage() {
                       </Link>
 
                       <Link
-                        href={`/admin/blogs/edit/${blog.id}`}
+                        href={`/admin/blogs/${blog.id}`}
                         className="p-2 text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
                         title="Edit"
                       >
