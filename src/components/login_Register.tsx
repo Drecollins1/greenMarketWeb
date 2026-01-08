@@ -145,7 +145,11 @@ export default function AuthPage() {
         setShowOtpModal(false);
         
         // Redirect to home page after successful login
-        router.push('/');
+        if(response.data.data.user.type === 'user'){
+          router.push('/');
+        }else{
+          router.push('/admin');
+        }
       }
     } catch (error: any) {
       console.error('OTP verification error:', error);

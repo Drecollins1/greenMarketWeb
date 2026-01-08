@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { 
   FaBox, 
-  FaDollarSign, 
+  FaMoneyBillWave, 
   FaUsers, 
   FaChartBar, 
   FaFileAlt, 
@@ -16,8 +16,11 @@ import {
   FaEllipsisV 
 } from 'react-icons/fa';
 import React from 'react';
+import { DashboardService } from '@/services/adminDashboard';
+import { DashboardData } from '@/types/adminDashboard';
+import { toast } from 'react-toastify';
 
-// Sample data for sales chart
+// Sample data for sales chart (you should replace with real API data)
 const salesData = [
   { date: '01 Jan', sales: 4200, order: 3800 },
   { date: '05 Jan', sales: 3800, order: 3200 },
@@ -33,23 +36,83 @@ const salesData = [
   { date: '25 Feb', sales: 6600, order: 6000 },
 ];
 
-// Channel data for pie chart
-const channelData = [
-  { name: 'Total Users', value: 48, color: '#10b981' },
-  { name: 'All Products', value: 30, color: '#3b82f6' },
-  { name: 'Escrow Request', value: 22, color: '#f59e0b' },
-];
-
 // Recent products data
 const recentProducts = [
-  { id: 1, Icon: FaCookieBite, name: 'Cookie', status: 'Rejected', price: '$10.00' },
-  { id: 2, Icon: FaWineGlassAlt, name: 'Glass', status: 'Accepted', price: '$70.10' },
-  { id: 3, Icon: FaHeadphonesAlt, name: 'Headphone', status: 'Pending', price: '$870.50' },
-  { id: 4, Icon: FaFlask, name: 'Perfume', status: 'Pending', price: '$70.50' },
+  { id: 1, Icon: FaCookieBite, name: 'Cookie', status: 'Rejected' as const, price: '₦10.00' },
+  { id: 2, Icon: FaWineGlassAlt, name: 'Glass', status: 'Accepted' as const, price: '₦70.10' },
+  { id: 3, Icon: FaHeadphonesAlt, name: 'Headphone', status: 'Pending' as const, price: '₦870.50' },
+  { id: 4, Icon: FaFlask, name: 'Perfume', status: 'Pending' as const, price: '₦70.50' },
 ];
 
 export default function Dashboard() {
   const [timeFilter, setTimeFilter] = useState('May');
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Calculate channel data from dashboard stats
+  const getChannelData = () => {
+    if (!dashboardData) return [];
+    
+    const total = dashboardData.admin.users + dashboardData.admin.products + dashboardData.admin.escrows;
+    
+    return [
+      { 
+        name: 'Total Users', 
+        value: Math.round((dashboardData.admin.users / total) * 100),
+        color: '#10b981' 
+      },
+      { 
+        name: 'All Products', 
+        value: Math.round((dashboardData.admin.products / total) * 100),
+        color: '#3b82f6' 
+      },
+      { 
+        name: 'Escrow Request', 
+        value: Math.round((dashboardData.admin.escrows / total) * 100),
+        color: '#f59e0b' 
+      },
+    ];
+  };
+
+  // Format wallet amount
+  const formatWallet = (wallet: string) => {
+    return `₦${parseFloat(wallet).toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    })}`;
+  };
+
+  // Fetch dashboard data
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
+        const data = await DashboardService.getDashboardStats();
+        setDashboardData(data);
+      } catch (error) {
+        console.error('Failed to fetch dashboard data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800 mb-1">Overview</h1>
+          <p className="text-sm text-gray-500">Monitor your business performance</p>
+        </div>
+        <div className="p-8 text-center">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
+          <p className="mt-2 text-sm text-gray-500">Loading dashboard data...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -58,8 +121,6 @@ export default function Dashboard() {
         <h1 className="text-2xl font-bold text-gray-800 mb-1">Overview</h1>
         <p className="text-sm text-gray-500">Monitor your business performance</p>
       </div>
-
-      
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -94,7 +155,9 @@ export default function Dashboard() {
 
           <div className="mb-4">
             <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-bold text-gray-800">$10,552.40</span>
+              <span className="text-3xl font-bold text-gray-800">
+                {dashboardData ? formatWallet(dashboardData.wallet) : '₦0.00'}
+              </span>
               <span className="text-sm font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded">
                 +8.3%
               </span>
@@ -143,16 +206,13 @@ export default function Dashboard() {
         <div className="bg-white rounded-xl border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold text-gray-800">Channels</h2>
-            <button className="text-sm text-green-600 hover:text-green-700 font-medium">
-              View All
-            </button>
           </div>
 
           <div className="flex justify-center mb-6">
             <ResponsiveContainer width={200} height={200}>
               <PieChart>
                 <Pie
-                  data={channelData}
+                  data={getChannelData()}
                   cx="50%"
                   cy="50%"
                   innerRadius={60}
@@ -160,8 +220,8 @@ export default function Dashboard() {
                   paddingAngle={5}
                   dataKey="value"
                 >
-                  {channelData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  {getChannelData().map((entry, index) => (
+                    <Cell key={`cell-₦{index}`} fill={entry.color} />
                   ))}
                 </Pie>
               </PieChart>
@@ -169,7 +229,7 @@ export default function Dashboard() {
           </div>
 
           <div className="space-y-3">
-            {channelData.map((channel) => (
+            {getChannelData().map((channel) => (
               <div key={channel.name} className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div 
@@ -180,7 +240,11 @@ export default function Dashboard() {
                 </div>
                 <div className="text-right">
                   <div className="text-sm font-semibold text-gray-800">{channel.value}%</div>
-                  <div className="text-xs text-gray-500">+{channel.value * 10}</div>
+                  <div className="text-xs text-gray-500">
+                    {channel.name === 'Total Users' && `+${dashboardData?.admin.users}`}
+                    {channel.name === 'All Products' && `+${dashboardData?.admin.products}`}
+                    {channel.name === 'Escrow Request' && `+${dashboardData?.admin.escrows}`}
+                  </div>
                 </div>
               </div>
             ))}
@@ -193,15 +257,15 @@ export default function Dashboard() {
         <StatCard
           Icon={FaBox}
           title="All Products"
-          value="310"
+          value={dashboardData?.admin.products.toString() || "0"}
           trend="+8.5%"
           trendUp={true}
           viewLink="#"
         />
         <StatCard
-          Icon={FaDollarSign}
-          title="Sales"
-          value="$3,759.00"
+          Icon={FaMoneyBillWave}
+          title="Wallet Balance"
+          value={dashboardData ? formatWallet(dashboardData.wallet) : "₦0.00"}
           trend="-4.2%"
           trendUp={false}
           viewLink="#"
@@ -209,15 +273,15 @@ export default function Dashboard() {
         <StatCard
           Icon={FaUsers}
           title="Total Users"
-          value="1,247"
+          value={dashboardData?.admin.users.toString() || "0"}
           trend="+12.3%"
           trendUp={true}
           viewLink="#"
         />
         <StatCard
           Icon={FaChartBar}
-          title="Revenue"
-          value="$12,450"
+          title="Escrows"
+          value={dashboardData?.admin.escrows.toString() || "0"}
           trend="+6.7%"
           trendUp={true}
           viewLink="#"
@@ -233,7 +297,7 @@ export default function Dashboard() {
             <ActivityCard
               Icon={FaFileAlt}
               label="Escrow Requested"
-              value="110"
+              value={dashboardData?.escrow.toString() || "0"}
               subtitle="Product"
             />
             <ActivityCard
@@ -261,9 +325,6 @@ export default function Dashboard() {
         <div className="bg-white rounded-xl border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold text-gray-800">Recent Reviews</h2>
-            <button className="text-sm text-green-600 hover:text-green-700 font-medium">
-              View All
-            </button>
           </div>
           <div className="space-y-4">
             <ReviewCard
@@ -289,9 +350,6 @@ export default function Dashboard() {
       <div className="bg-white rounded-xl border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-semibold text-gray-800">Recent Listed Products</h2>
-          <button className="text-sm text-green-600 hover:text-green-700 font-medium">
-            View All
-          </button>
         </div>
         
         <div className="overflow-x-auto">
@@ -376,7 +434,7 @@ function StatCard({
         <div className="w-12 text-[#39B54A] h-12 rounded-lg bg-green-50 flex items-center justify-center text-2xl">
           <Icon />
         </div>
-        <span className={`text-sm font-medium ${trendUp ? 'text-green-600' : 'text-red-600'}`}>
+        <span className={`text-sm font-medium ₦{trendUp ? 'text-green-600' : 'text-red-600'}`}>
           {trend}
         </span>
       </div>
