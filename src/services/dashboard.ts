@@ -106,3 +106,81 @@ export const getEscrowCount = async (): Promise<number | null> => {
     return null;
   }
 };
+
+// TYPES for Profile Image Update
+export interface UpdateProfileImageResponse {
+  message: string;
+  status: boolean;
+  data: {
+    id: number;
+    name: string;
+    email: string;
+    phone: string;
+    type: string;
+    avatar: string;
+    banner: string;
+    business: {
+      name: string;
+      description: string;
+      address: string;
+      logo: string;
+    };
+    settings: {
+      escrow: string;
+      notification: string;
+    };
+    socials: {
+      twitter: string | null;
+      facebook: string | null;
+      instagram: string | null;
+    };
+    tags: string[];
+    fcm_token: string | null;
+    email_verified_at: string | null;
+    provider_name: string | null;
+    provider_id: string | null;
+    remember_token: string | null;
+    created_at: string;
+    updated_at: string;
+    deleted_at: string | null;
+    is_admin: boolean;
+    product_count: number;
+  };
+}
+
+// UPDATE PROFILE IMAGE
+export const updateProfileImage = async (imageFile: File): Promise<UpdateProfileImageResponse | null> => {
+  try {
+    const formData = new FormData();
+    formData.append('image', imageFile);
+    formData.append('avatar', imageFile); 
+    formData.append('file', imageFile); 
+  
+
+    const response = await ApiFetcher.post<UpdateProfileImageResponse>(
+      '/auth/profile',
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
+
+    if (response?.data?.status) {
+      toast.success(response.data.message || "Profile image updated successfully!");
+      return response.data;
+    }
+
+    toast.error(response?.data?.message || "Failed to update profile image");
+    return null;
+  } catch (error: any) {
+    console.error("Error updating profile image:", error);
+    
+    // Handle specific error messages
+    const errorMessage = error.response?.data?.message || "Error updating profile image";
+    toast.error(errorMessage);
+    
+    return null;
+  }
+};

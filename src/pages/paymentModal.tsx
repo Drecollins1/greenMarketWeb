@@ -46,7 +46,7 @@ export const PaymentSuccessModal: React.FC<PaymentSuccessModalProps> = ({ isOpen
 
         <div className="relative text-center pt-20 pb-14 px-6">
           <div className="flex justify-center mb-6">
-            <div className="relative w-28 h-28 bg-gradient-to-br from-[#39B54A]/20 to-[#2E8B57]/20 rounded-3xl flex items-center justify-center shadow-lg border border-[#39B54A]/30 animate-glow">
+            <div className="relative w-28 h-28 bg-linear-to-br from-[#39B54A]/20 to-[#2E8B57]/20 rounded-3xl flex items-center justify-center shadow-lg border border-[#39B54A]/30 animate-glow">
               <FaCheckCircle className="text-[#39B54A] text-7xl drop-shadow-xl" />
             </div>
           </div>
@@ -61,10 +61,10 @@ export const PaymentSuccessModal: React.FC<PaymentSuccessModalProps> = ({ isOpen
 
           <button
             onClick={onClose}
-            className="w-full bg-gradient-to-r from-[#39B54A] to-[#2E8B57] hover:opacity-90 text-white font-semibold py-4 px-8 rounded-2xl transition-all duration-200 shadow-xl hover:shadow-2xl active:scale-95 relative overflow-hidden"
+            className="w-full bg-linear-to-r from-[#39B54A] to-[#2E8B57] hover:opacity-90 text-white font-semibold py-4 px-8 rounded-2xl transition-all duration-200 shadow-xl hover:shadow-2xl active:scale-95 relative overflow-hidden"
           >
             <span className="relative z-10">Continue</span>
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 animate-shimmerSlow"></div>
+            <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent -skew-x-12 animate-shimmerSlow"></div>
           </button>
         </div>
       </div>
@@ -96,10 +96,10 @@ export default function Demo() {
   const [isOpen, setIsOpen] = React.useState(false);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-emerald-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-green-50 to-emerald-100 flex items-center justify-center p-4">
       <button
         onClick={() => setIsOpen(true)}
-        className="bg-gradient-to-r from-[#39B54A] to-[#2E8B57] hover:opacity-90 text-white font-semibold py-3.5 px-8 rounded-xl shadow-lg transition-all duration-200 hover:scale-105 active:scale-95"
+        className="bg-linear-to-r from-[#39B54A] to-[#2E8B57] hover:opacity-90 text-white font-semibold py-3.5 px-8 rounded-xl shadow-lg transition-all duration-200 hover:scale-105 active:scale-95"
       >
         Show Payment Modal
       </button>

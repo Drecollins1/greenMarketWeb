@@ -35,6 +35,7 @@ import { MdOutlineProductionQuantityLimits } from "react-icons/md";
 import { FaX } from "react-icons/fa6";
 import { getCategories, CategoryItem } from "@/services/category";
 import MobileBottomNav from "@/components/MobileBottomNav";
+import Head from "next/head";
 
 type Category = {
   id: number;
@@ -73,6 +74,7 @@ function CategoryDrawer({
       onClose();
     }
   };
+  
 
   return (
     <div className="fixed inset-0 z-99998">
@@ -363,6 +365,13 @@ export default function App({ Component, pageProps }: AppProps) {
 
   return (
     <>
+    <Head>
+      <title>Green Market | Best Shop for Farm Product</title>
+      <meta
+        name="description"
+        content="Green Market is the best online shop for fresh farm products, organic foods, and agricultural supplies. Buy directly from trusted farmers."
+      />
+    </Head>
       {isAdminRoute ? (
         <AdminLayout>
           <Component {...pageProps} />

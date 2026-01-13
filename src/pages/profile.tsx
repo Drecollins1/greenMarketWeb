@@ -1,15 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  User,
-  Package,
-  ShoppingCart,
-  MessageSquare,
-  Home,
-  Menu,
-  X,
-  UserPlus,
-  ArrowRightLeft,
-} from "lucide-react";
+import { Edit, User, Package, ShoppingCart, Home, Menu, X, UserPlus, ArrowRightLeft} from "lucide-react";
 import { FaChevronRight } from "react-icons/fa6";
 import EscrowRequests from "@/components/EscrowOrders";
 import { getDashboardStats, DashboardStats } from "@/services/dashboard";
@@ -26,6 +16,7 @@ import { GetOrdersResponse } from "@/types/orders";
 import Image from "next/image";
 import ApiFetcher from "@/utils/apis";
 import ReferralTab from "@/components/ReferralTab";
+import ProfileImageUpdateModal from "@/components/ProfileImageUpdateModal";
 // Types
 interface VendorProfile {
   firstName: string;
@@ -98,6 +89,7 @@ const Profile = () => {
   const [orders, setOrders] = useState<GetOrdersResponse | null>(null);
   const [currentOrdersPage, setCurrentOrdersPage] = useState(1);
   const [ordersPerPage, setOrdersPerPage] = useState(10);
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [ordersFilters, setOrdersFilters] = useState({
     page: 1,
     per_page: 10,
@@ -209,6 +201,34 @@ const Profile = () => {
       month: "short",
       day: "numeric",
     });
+  };
+
+  const handleImageUpdateSuccess = (newAvatar: string) => {
+    // Update the userProfile state with new avatar
+    if (userProfile) {
+      setUserProfile({
+        ...userProfile,
+        avatar: newAvatar
+      });
+    }
+    
+    // Refresh dashboard data if needed
+    if (activeTab === "dashboard") {
+      fetchDashboardData();
+    }
+  };
+
+  // Add a helper function to handle image errors
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    // Fallback to default icon if image fails to load
+    e.currentTarget.style.display = 'none';
+    const parent = e.currentTarget.parentElement;
+    if (parent) {
+      const fallbackIcon = document.createElement('div');
+      fallbackIcon.className = 'w-full h-full flex items-center justify-center';
+      fallbackIcon.innerHTML = '<User className="w-6 h-6 text-gray-600" />';
+      parent.appendChild(fallbackIcon);
+    }
   };
 
   const fetchMyProducts = async () => {
@@ -330,20 +350,34 @@ const Profile = () => {
             lg:block
           `}
           >
-            <div className="flex items-center gap-3 mb-6 pb-6 border-b border-neutral-200">
-              <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center shrink-0 overflow-hidden">
-                {userProfile?.avatar ? (
-                  <Image
-                    src={userProfile.avatar}
-                    alt="Profile"
-                    className="w-full h-full object-cover"
-                    width={48}
-                    height={48}
-                  />
-                ) : (
-                  <User className="w-6 h-6 text-gray-600" />
-                )}
+            <div className="flex items-center gap-3 mb-6 pb-6 border-b border-neutral-200 relative">
+              {/* Profile Image Container with Edit Icon */}
+              <div className="relative group">
+                <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center shrink-0 overflow-hidden">
+                  {userProfile?.avatar ? (
+                    <Image
+                      src={userProfile.avatar}
+                      alt="Profile"
+                      className="w-full h-full object-cover"
+                      width={48}
+                      height={48}
+                      onError={handleImageError}
+                    />
+                  ) : (
+                    <User className="w-6 h-6 text-gray-600" />
+                  )}
+                </div>
+                
+                {/* Edit Icon Overlay */}
+                <button
+                  onClick={() => setIsImageModalOpen(true)}
+                  className="absolute -bottom-1 -right-1 w-6 h-6 bg-[#39B54A] rounded-full flex items-center justify-center text-white shadow-lg hover:bg-[#188727] transition-colors group-hover:scale-110 z-10"
+                  title="Edit profile picture"
+                >
+                  <Edit className="w-3 h-3" />
+                </button>
               </div>
+              
               <div className="min-w-0 flex-1">
                 <p className="text-sm text-gray-500">Welcome back!</p>
                 <p className="font-medium truncate">
@@ -825,16 +859,20 @@ const Profile = () => {
                       >
                         <div className="bg-gray-100 h-32 sm:h-40 rounded-lg mb-4 flex items-center justify-center overflow-hidden">
                           {product.thumbnail ? (
-                            <img
+                            <Image
                               src={product.thumbnail}
                               alt={product.title}
                               className="w-full h-full object-cover"
+                              width={160}
+                              height={160}
                             />
                           ) : product.images && product.images.length > 0 ? (
-                            <img
+                            <Image
                               src={product.images[0]}
                               alt={product.title}
                               className="w-full h-full object-cover"
+                              width={160}
+                              height={160}
                             />
                           ) : (
                             <Package className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400" />
@@ -873,9 +911,11 @@ const Profile = () => {
                           </span>
                         </div>
 
-                        <button className="w-full border border-neutral-200 px-4 py-2 rounded-lg hover:bg-gray-50 text-sm">
-                          Edit Product
-                        </button>
+                        <Link href={`/edit-product/${product.id}`}>
+                          <button className="w-full border border-neutral-200 px-4 py-2 rounded-lg hover:bg-gray-50 text-sm">
+                            Edit Product
+                          </button>
+                        </Link>
                       </div>
                     ))}
                   </div>
@@ -1039,6 +1079,13 @@ const Profile = () => {
           </div>
         </div>
       </div>
+      {/* Profile Image Update Modal */}
+      <ProfileImageUpdateModal
+        isOpen={isImageModalOpen}
+        onClose={() => setIsImageModalOpen(false)}
+        currentImage={userProfile?.avatar || null}
+        onUpdateSuccess={handleImageUpdateSuccess}
+      />
     </div>
   );
 };
