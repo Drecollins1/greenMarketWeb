@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   FaUser, 
   FaEnvelope, 
@@ -10,199 +10,56 @@ import {
   FaTruck,
   FaEllipsisV,
   FaChevronDown,
-  FaChevronUp
+  FaChevronUp,
+  FaSpinner
 } from 'react-icons/fa';
+import { getOffers, acceptOffer, rejectOffer } from '@/services/escrow';
+import { EscrowOffer, EscrowStatus, GetOffersRequest } from '@/types/escrow';
+import { toast } from 'react-toastify';
 
-// Sample escrow requests data with image URLs
-const escrowRequests = [
-  {
-    id: 1,
-    product: { 
-      image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=80&h=80&fit=crop&crop=face', 
-      name: 'Wireless Headphones', 
-      price: '$150.00' 
-    },
-    buyer: {
-      name: 'John Doe',
-      email: 'john.doe@example.com',
-      phone: '+1 (555) 123-4567',
-      address: '123 Main St, New York, NY 10001'
-    },
-    seller: {
-      name: 'Jane Smith',
-      email: 'jane.smith@marketplace.com',
-      phone: '+1 (555) 987-6543',
-      address: '456 Oak Ave, Los Angeles, CA 90210'
-    },
-    status: 'Pending',
-    date: '2025-11-20'
-  },
-  {
-    id: 2,
-    product: { 
-      image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=80&h=80&fit=crop&crop=face', 
-      name: 'Crystal Glass Set', 
-      price: '$75.50' 
-    },
-    buyer: {
-      name: 'Alice Johnson',
-      email: 'alice.j@example.com',
-      phone: '+1 (555) 234-5678',
-      address: '789 Pine Rd, Chicago, IL 60601'
-    },
-    seller: {
-      name: 'Bob Wilson',
-      email: 'bob.w@vendor.net',
-      phone: '+1 (555) 876-5432',
-      address: '101 Elm St, Miami, FL 33101'
-    },
-    status: 'In Progress',
-    date: '2025-11-22'
-  },
-  {
-    id: 3,
-    product: { 
-      image: 'https://images.unsplash.com/photo-1574169208507-84376144848b?w=80&h=80&fit=crop&crop=face', 
-      name: 'Premium Perfume', 
-      price: '$120.00' 
-    },
-    buyer: {
-      name: 'Carlos Ramirez',
-      email: 'carlos.r@buyer.org',
-      phone: '+1 (555) 345-6789',
-      address: '202 Cedar Ln, Houston, TX 77001'
-    },
-    seller: {
-      name: 'Diana Lee',
-      email: 'diana.l@shop.com',
-      phone: '+1 (555) 765-4321',
-      address: '303 Birch Blvd, Seattle, WA 98101'
-    },
-    status: 'Successful',
-    date: '2025-11-18'
-  },
-  {
-    id: 4,
-    product: { 
-      image: 'https://images.unsplash.com/photo-1567306301408-9b74779a11af?w=80&h=80&fit=crop&crop=face', 
-      name: 'Gourmet Cookie Assortment', 
-      price: '$25.99' 
-    },
-    buyer: {
-      name: 'Eve Brown',
-      email: 'eve.brown@email.com',
-      phone: '+1 (555) 456-7890',
-      address: '404 Maple Dr, Boston, MA 02101'
-    },
-    seller: {
-      name: 'Frank Garcia',
-      email: 'frank.g@seller.io',
-      phone: '+1 (555) 654-3210',
-      address: '505 Walnut Way, Denver, CO 80201'
-    },
-    status: 'Failed',
-    date: '2025-11-19'
-  },
-  {
-    id: 5,
-    product: { 
-      image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&h=80&fit=crop&crop=face', 
-      name: 'Noise-Cancelling Earbuds', 
-      price: '$200.00' 
-    },
-    buyer: {
-      name: 'Grace Kim',
-      email: 'grace.k@client.net',
-      phone: '+1 (555) 567-8901',
-      address: '606 Aspen Ave, Phoenix, AZ 85001'
-    },
-    seller: {
-      name: 'Henry Davis',
-      email: 'henry.d@trader.com',
-      phone: '+1 (555) 543-2109',
-      address: '707 Spruce St, Portland, OR 97201'
-    },
-    status: 'Not Delivered',
-    date: '2025-11-21'
-  },
-  {
-    id: 6,
-    product: { 
-      image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=80&h=80&fit=crop&crop=face', 
-      name: 'Designer Watch', 
-      price: '$350.00' 
-    },
-    buyer: {
-      name: 'Ian Thompson',
-      email: 'ian.t@buyer.net',
-      phone: '+1 (555) 678-9012',
-      address: '808 Fir St, Atlanta, GA 30301'
-    },
-    seller: {
-      name: 'Julia Martinez',
-      email: 'julia.m@seller.com',
-      phone: '+1 (555) 432-1098',
-      address: '909 Cypress Ct, San Francisco, CA 94101'
-    },
-    status: 'Pending',
-    date: '2025-11-23'
-  },
-  {
-    id: 7,
-    product: { 
-      image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=80&h=80&fit=crop&crop=face', 
-      name: 'Leather Handbag', 
-      price: '$180.00' 
-    },
-    buyer: {
-      name: 'Kara Lee',
-      email: 'kara.l@example.org',
-      phone: '+1 (555) 789-0123',
-      address: '1010 Redwood Rd, Dallas, TX 75201'
-    },
-    seller: {
-      name: 'Liam Chen',
-      email: 'liam.c@vendor.io',
-      phone: '+1 (555) 321-0987',
-      address: '1111 Sycamore St, Austin, TX 78701'
-    },
-    status: 'In Progress',
-    date: '2025-11-24'
-  },
-];
 
 const statusColors = {
-  Pending: 'bg-yellow-100 text-yellow-700 border-yellow-200',
-  'In Progress': 'bg-blue-100 text-blue-700 border-blue-200',
-  Successful: 'bg-green-100 text-green-700 border-green-200',
-  Failed: 'bg-red-100 text-red-700 border-red-200',
-  'Not Delivered': 'bg-orange-100 text-orange-700 border-orange-200',
+  pending: 'bg-yellow-100 text-yellow-700 border-yellow-200',
+  accepted: 'bg-blue-100 text-blue-700 border-blue-200',
+  success: 'bg-green-100 text-green-700 border-green-200',
+  failed: 'bg-red-100 text-red-700 border-red-200',
+  rejected: 'bg-red-100 text-red-700 border-red-200',
+  cancelled: 'bg-gray-100 text-gray-700 border-gray-200',
+  disputed: 'bg-orange-100 text-orange-700 border-orange-200',
+  abandoned: 'bg-gray-100 text-gray-700 border-gray-200',
+  in_escrow: 'bg-purple-100 text-purple-700 border-purple-200',
 };
 
 const statusIcons = {
-  Pending: FaExclamationTriangle,
-  'In Progress': FaTruck,
-  Successful: FaCheckCircle,
-  Failed: FaTimesCircle,
-  'Not Delivered': FaTruck,
+  pending: FaExclamationTriangle,
+  accepted: FaTruck,
+  success: FaCheckCircle,
+  failed: FaTimesCircle,
+  rejected: FaTimesCircle,
+  cancelled: FaTimesCircle,
+  disputed: FaExclamationTriangle,
+  abandoned: FaTimesCircle,
+  in_escrow: FaTruck,
 };
 
 interface UserDetailsProps {
   user: {
-    name: string;
+    first_name: string;
+    last_name: string | null;
     email: string;
-    phone: string;
-    address: string;
+    phone: string | null;
   };
   isExpanded: boolean;
 }
 
 function UserDetails({ user, isExpanded }: UserDetailsProps) {
+  const fullName = user.last_name ? `${user.first_name} ${user.last_name}` : user.first_name;
+  
   return (
     <div className={`space-y-2 ${isExpanded ? 'bg-gray-50 p-3 rounded-lg border border-gray-200' : ''}`}>
       <div className="flex items-center gap-2">
         <FaUser className="text-gray-400 text-sm" />
-        <span className="text-sm font-medium text-gray-800 truncate max-w-[150px]">{user.name}</span>
+        <span className="text-sm font-medium text-gray-800 truncate max-w-37.5">{fullName}</span>
       </div>
       {isExpanded && (
         <>
@@ -210,14 +67,12 @@ function UserDetails({ user, isExpanded }: UserDetailsProps) {
             <FaEnvelope className="text-gray-400 text-sm" />
             <span className="text-xs text-gray-600 truncate">{user.email}</span>
           </div>
-          <div className="flex items-center gap-2">
-            <FaPhone className="text-gray-400 text-sm" />
-            <span className="text-xs text-gray-600">{user.phone}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <FaMapMarkerAlt className="text-gray-400 text-sm" />
-            <span className="text-xs text-gray-600 truncate">{user.address}</span>
-          </div>
+          {user.phone && (
+            <div className="flex items-center gap-2">
+              <FaPhone className="text-gray-400 text-sm" />
+              <span className="text-xs text-gray-600">{user.phone}</span>
+            </div>
+          )}
         </>
       )}
     </div>
@@ -225,20 +80,45 @@ function UserDetails({ user, isExpanded }: UserDetailsProps) {
 }
 
 export default function EscrowRequests() {
-  const [requests, setRequests] = useState(escrowRequests);
+  const [requests, setRequests] = useState<EscrowOffer[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
+  const [loading, setLoading] = useState(false);
+  const [totalPages, setTotalPages] = useState(1);
+  const [statusFilter, setStatusFilter] = useState<EscrowStatus | ''>('');
 
   const itemsPerPage = 5;
+
+  const fetchOffers = async (page: number = 1, status?: EscrowStatus) => {
+    setLoading(true);
+    try {
+      const params: GetOffersRequest = { page };
+      if (status) params.status = status;
+      
+      const response = await getOffers(params);
+      if (response) {
+        setRequests(response.data);
+        setTotalPages(response.last_page);
+      }
+    } catch (error) {
+      console.error('Failed to fetch offers:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOffers(currentPage, statusFilter || undefined);
+  }, [currentPage, statusFilter]);
+
   const filteredRequests = requests.filter(
     (req) =>
-      req.buyer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      req.seller.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      req.product.name.toLowerCase().includes(searchTerm.toLowerCase())
+      req.buyer.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      req.seller.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      req.product.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const totalPages = Math.ceil(filteredRequests.length / itemsPerPage);
   const paginatedRequests = filteredRequests.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
@@ -254,16 +134,21 @@ export default function EscrowRequests() {
     setExpandedRows(newExpanded);
   };
 
-  const updateStatus = (id: number, newStatus: string) => {
-    setRequests((prev) =>
-      prev.map((req) =>
-        req.id === id ? { ...req, status: newStatus } : req
-      )
-    );
-    console.log(`Updated escrow request ${id} status to ${newStatus}`);
+  const handleAcceptOffer = async (offerId: number) => {
+    const success = await acceptOffer(offerId);
+    if (success) {
+      fetchOffers(currentPage, statusFilter || undefined);
+    }
   };
 
-  const statusOptions = ['Pending', 'In Progress', 'Successful', 'Failed', 'Not Delivered'];
+  const handleRejectOffer = async (offerId: number) => {
+    const success = await rejectOffer(offerId);
+    if (success) {
+      fetchOffers(currentPage, statusFilter || undefined);
+    }
+  };
+
+  const statusOptions: EscrowStatus[] = ['pending', 'accepted', 'rejected', 'cancelled', 'success', 'failed', 'disputed', 'abandoned', 'in_escrow'];
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -277,6 +162,21 @@ export default function EscrowRequests() {
           <p className="text-sm text-gray-500">Manage and update escrow request details</p>
         </div>
         <div className="flex items-center gap-4">
+          <select
+            value={statusFilter}
+            onChange={(e) => {
+              setStatusFilter(e.target.value as EscrowStatus | '');
+              setCurrentPage(1);
+            }}
+            className="px-4 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white shadow-sm"
+          >
+            <option value="">All Status</option>
+            {statusOptions.map((status) => (
+              <option key={status} value={status}>
+                {status.charAt(0).toUpperCase() + status.slice(1).replace('_', ' ')}
+              </option>
+            ))}
+          </select>
           <input
             type="text"
             placeholder="Search by name or product..."
@@ -306,101 +206,116 @@ export default function EscrowRequests() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {paginatedRequests.map((request) => {
-                const isExpanded = expandedRows.has(request.id);
-                const StatusIcon = statusIcons[request.status as keyof typeof statusIcons];
-                return (
-                  <tr key={request.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="py-4 px-6">
-                      <span className="text-sm font-medium text-gray-800">#{request.id}</span>
-                    </td>
-                    <td className="py-4 px-6">
-                      <div className="flex items-center gap-3">
-                        <img
-                          src={request.product.image}
-                          alt={request.product.name}
-                          className="w-12 h-12 rounded-lg object-cover shadow-md"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = 'https://via.placeholder.com/48?text=Product';
-                          }}
-                        />
-                        <div>
-                          <span className="text-sm font-medium text-gray-800 block">{request.product.name}</span>
+              {loading ? (
+                <tr>
+                  <td colSpan={8} className="py-12 text-center">
+                    <FaSpinner className="mx-auto h-8 w-8 text-green-500 animate-spin mb-4" />
+                    <p className="text-sm text-gray-500">Loading escrow requests...</p>
+                  </td>
+                </tr>
+              ) : paginatedRequests.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="py-12 text-center">
+                    <FaExclamationTriangle className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">No Escrow Requests</h3>
+                    <p className="text-sm">No escrow requests found matching the search criteria.</p>
+                  </td>
+                </tr>
+              ) : (
+                paginatedRequests.map((request) => {
+                  const isExpanded = expandedRows.has(request.id);
+                  const StatusIcon = statusIcons[request.status as keyof typeof statusIcons];
+                  return (
+                    <tr key={request.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="py-4 px-6">
+                        <span className="text-sm font-medium text-gray-800">#{request.id}</span>
+                      </td>
+                      <td className="py-4 px-6">
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={request.product.images[0] || 'https://via.placeholder.com/48?text=Product'}
+                            alt={request.product.title}
+                            className="w-12 h-12 rounded-lg object-cover shadow-md"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = 'https://via.placeholder.com/48?text=Product';
+                            }}
+                          />
+                          <div>
+                            <span className="text-sm font-medium text-gray-800 block">{request.product.title}</span>
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="py-4 px-6">
-                      <span className="text-sm font-semibold text-gray-800">{request.product.price}</span>
-                    </td>
-                    <td className="py-4 px-6 max-w-xs">
-                      <div
-                        className="cursor-pointer"
-                        onClick={() => toggleRowExpansion(request.id)}
-                      >
-                        <UserDetails user={request.buyer} isExpanded={isExpanded} />
-                        {isExpanded && (
-                          <button className="text-xs text-green-600 hover:text-green-700 flex items-center gap-1 mt-2">
-                            <FaChevronUp className="w-3 h-3" />
-                            <span>Collapse</span>
-                          </button>
-                        )}
-                        {!isExpanded && (
-                          <button className="text-xs text-green-600 hover:text-green-700 flex items-center gap-1 mt-2">
-                            <FaChevronDown className="w-3 h-3" />
-                            <span>Expand</span>
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                    <td className="py-4 px-6 max-w-xs">
-                      <div
-                        className="cursor-pointer"
-                        onClick={() => toggleRowExpansion(request.id)}
-                      >
-                        <UserDetails user={request.seller} isExpanded={isExpanded} />
-                      </div>
-                    </td>
-                    <td className="py-4 px-6">
-                      <span className="text-sm text-gray-800">{new Date(request.date).toLocaleDateString()}</span>
-                    </td>
-                    <td className="py-4 px-6">
-                      <div className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border ${statusColors[request.status as keyof typeof statusColors]}`}>
-                        <StatusIcon className="w-3 h-3" />
-                        {request.status}
-                      </div>
-                    </td>
-                    <td className="py-4 px-6">
-                      <div className="flex items-center gap-2">
-                        <select
-                          value={request.status}
-                          onChange={(e) => updateStatus(request.id, e.target.value)}
-                          className="px-2 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+                      </td>
+                      <td className="py-4 px-6">
+                        <span className="text-sm font-semibold text-gray-800">${request.amount.toFixed(2)}</span>
+                      </td>
+                      <td className="py-4 px-6 max-w-xs">
+                        <div
+                          className="cursor-pointer"
+                          onClick={() => toggleRowExpansion(request.id)}
                         >
-                          {statusOptions.map((option) => (
-                            <option key={option} value={option}>
-                              {option}
-                            </option>
-                          ))}
-                        </select>
-                        <button className="text-gray-400 hover:text-gray-600 p-1 rounded hover:bg-gray-100">
-                          <FaEllipsisV className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
+                          <UserDetails user={request.buyer} isExpanded={isExpanded} />
+                          {isExpanded && (
+                            <button className="text-xs text-green-600 hover:text-green-700 flex items-center gap-1 mt-2">
+                              <FaChevronUp className="w-3 h-3" />
+                              <span>Collapse</span>
+                            </button>
+                          )}
+                          {!isExpanded && (
+                            <button className="text-xs text-green-600 hover:text-green-700 flex items-center gap-1 mt-2">
+                              <FaChevronDown className="w-3 h-3" />
+                              <span>Expand</span>
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                      <td className="py-4 px-6 max-w-xs">
+                        <div
+                          className="cursor-pointer"
+                          onClick={() => toggleRowExpansion(request.id)}
+                        >
+                          <UserDetails user={request.seller} isExpanded={isExpanded} />
+                        </div>
+                      </td>
+                      <td className="py-4 px-6">
+                        <span className="text-sm text-gray-800">{new Date(request.created_at).toLocaleDateString()}</span>
+                      </td>
+                      <td className="py-4 px-6">
+                        <div className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border ${statusColors[request.status as keyof typeof statusColors]}`}>
+                          <StatusIcon className="w-3 h-3" />
+                          {request.status.charAt(0).toUpperCase() + request.status.slice(1).replace('_', ' ')}
+                        </div>
+                      </td>
+                      <td className="py-4 px-6">
+                        <div className="flex items-center gap-2">
+                          {request.status === 'pending' && (
+                            <>
+                              <button
+                                onClick={() => handleAcceptOffer(request.id)}
+                                className="px-2 py-1 text-xs bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+                              >
+                                Accept
+                              </button>
+                              <button
+                                onClick={() => handleRejectOffer(request.id)}
+                                className="px-2 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+                              >
+                                Reject
+                              </button>
+                            </>
+                          )}
+                          <button className="text-gray-400 hover:text-gray-600 p-1 rounded hover:bg-gray-100">
+                            <FaEllipsisV className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>
 
-        {filteredRequests.length === 0 && (
-          <div className="text-center py-12 text-gray-500 bg-gray-50">
-            <FaExclamationTriangle className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No Escrow Requests</h3>
-            <p className="text-sm">No escrow requests found matching the search criteria.</p>
-          </div>
-        )}
 
         {/* Pagination */}
         {totalPages > 1 && (

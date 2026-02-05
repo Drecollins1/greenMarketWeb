@@ -164,10 +164,10 @@ export default function ProductManagement() {
     }
   }, []);
 
-  // Initial fetch
+  // Initial fetch and page changes
   useEffect(() => {
     fetchProducts(currentPage, searchTerm);
-  }, [currentPage, fetchProducts]);
+  }, [currentPage, searchTerm]);
 
   // Handle search with debounce
   useEffect(() => {
