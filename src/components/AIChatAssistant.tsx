@@ -22,8 +22,15 @@ const AIChatAssistant: React.FC = () => {
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [quickQuestions, setQuickQuestions] = useState<string[]>([]);
+  const [buttonPosition, setButtonPosition] = useState<"left" | "right">("right");
+  const [buttonTop, setButtonTop] = useState(
+    typeof window !== "undefined" ? window.innerHeight - 120 : 600
+  );
+  const [isDragging, setIsDragging] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatWindowRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const dragStartPos = useRef({ x: 0, y: 0, startTop: 0 });
 
   // Pool of agriculture-related questions
   const questionPool = [
@@ -103,6 +110,97 @@ const AIChatAssistant: React.FC = () => {
     };
   }, [isOpen]);
 
+  // Dragging functionality
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!buttonRef.current) return;
+    setIsDragging(true);
+    dragStartPos.current = {
+      x: e.clientX,
+      y: e.clientY,
+      startTop: buttonTop,
+    };
+    e.preventDefault();
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (!buttonRef.current) return;
+    setIsDragging(true);
+    const touch = e.touches[0];
+    dragStartPos.current = {
+      x: touch.clientX,
+      y: touch.clientY,
+      startTop: buttonTop,
+    };
+  };
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging || !buttonRef.current) return;
+
+      // Calculate vertical movement (NOT inverted)
+      const deltaY = e.clientY - dragStartPos.current.y;
+      const newTop = dragStartPos.current.startTop + deltaY;
+
+      // Constrain within screen bounds (with padding)
+      const minTop = 80;
+      const maxTop = window.innerHeight - 100;
+      const constrainedTop = Math.max(minTop, Math.min(maxTop, newTop));
+
+      setButtonTop(constrainedTop);
+
+      // Determine which side based on mouse X position
+      const screenMiddle = window.innerWidth / 2;
+      if (e.clientX < screenMiddle) {
+        setButtonPosition("left");
+      } else {
+        setButtonPosition("right");
+      }
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!isDragging || !buttonRef.current) return;
+
+      const touch = e.touches[0];
+
+      // Calculate vertical movement (NOT inverted)
+      const deltaY = touch.clientY - dragStartPos.current.y;
+      const newTop = dragStartPos.current.startTop + deltaY;
+
+      // Constrain within screen bounds (with padding)
+      const minTop = 80;
+      const maxTop = window.innerHeight - 100;
+      const constrainedTop = Math.max(minTop, Math.min(maxTop, newTop));
+
+      setButtonTop(constrainedTop);
+
+      // Determine which side based on touch X position
+      const screenMiddle = window.innerWidth / 2;
+      if (touch.clientX < screenMiddle) {
+        setButtonPosition("left");
+      } else {
+        setButtonPosition("right");
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+    };
+
+    if (isDragging) {
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
+      document.addEventListener("touchmove", handleTouchMove);
+      document.addEventListener("touchend", handleMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+      document.removeEventListener("touchmove", handleTouchMove);
+      document.removeEventListener("touchend", handleMouseUp);
+    };
+  }, [isDragging, buttonTop]);
+
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return;
 
@@ -173,36 +271,65 @@ const AIChatAssistant: React.FC = () => {
     setInputMessage(question);
   };
 
+  const handleButtonClick = () => {
+    if (!isDragging) {
+      setIsOpen(true);
+    }
+  };
+
   return (
     <>
-      {/* Floating Chat Button */}
+      {/* Floating Chat Button - Draggable (Snaps to Left or Right) */}
       {!isOpen && (
         <button
-          onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 z-[9999] bg-gradient-to-r from-[#39B54A] to-emerald-600 text-white rounded-full p-4 shadow-2xl hover:shadow-green-500/50 hover:scale-110 transition-all duration-300 group"
+          ref={buttonRef}
+          onMouseDown={handleMouseDown}
+          onTouchStart={handleTouchStart}
+          onClick={handleButtonClick}
+          style={{
+            top: `${buttonTop}px`,
+            ...(buttonPosition === "right"
+              ? { right: "24px", left: "auto" }
+              : { left: "24px", right: "auto" }),
+          }}
+          className={`fixed z-[9999] bg-gradient-to-r from-[#39B54A] to-emerald-600 text-white rounded-full p-4 shadow-2xl transition-all duration-300 group ${
+            isDragging
+              ? "cursor-grabbing scale-110 shadow-green-500/60"
+              : "cursor-grab hover:scale-110 hover:shadow-green-500/50"
+          }`}
           aria-label="Open AI Chat Assistant"
         >
-          <div className="relative">
+          <div className="relative pointer-events-none">
             <FaComments className="text-2xl" />
-            <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-ping"></span>
-            <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full"></span>
+            {!isDragging && (
+              <>
+                <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-ping"></span>
+                <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full"></span>
+              </>
+            )}
           </div>
-          <span className="absolute right-16 top-1/2 -translate-y-1/2 bg-gray-800 text-white px-3 py-2 rounded-lg text-sm whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none hidden sm:block">
-            Need farming help? Ask me! 🌱
-          </span>
+          {!isDragging && (
+            <span
+              className={`absolute ${
+                buttonPosition === "right" ? "right-16" : "left-16"
+              } top-1/2 -translate-y-1/2 bg-gray-800 text-white px-3 py-2 rounded-lg text-sm whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none hidden sm:block`}
+            >
+              Need farming help? Ask me! 🌱
+            </span>
+          )}
         </button>
       )}
 
       {/* Backdrop Overlay */}
       {isOpen && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-9999 md:hidden" />
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-[9998] md:hidden" />
       )}
 
       {/* Chat Window */}
       {isOpen && (
         <div
           ref={chatWindowRef}
-          className="fixed z-9999
+          className="fixed z-[9999]
             /* Mobile: Full screen centered */
             inset-4 sm:inset-6
             /* Desktop: Bottom right */
