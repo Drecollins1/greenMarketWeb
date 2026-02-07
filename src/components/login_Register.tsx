@@ -462,7 +462,7 @@ export default function AuthPage() {
 
       {/* OTP Modal */}
       {showOtpModal && (
-        <div className="fixed inset-0 bg-gray-400 bg-opacity-50 flex items-center justify-center px-4 z-50 backdrop-blur-sm">
+        <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center px-4 z-99999 backdrop-blur supports-backdrop-filter:bg-white/60">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 animate-fadeIn">
             <h2 className="text-2xl font-bold text-gray-900 mb-2 text-center">
               Enter OTP

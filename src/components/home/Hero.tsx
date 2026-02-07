@@ -83,7 +83,7 @@ export default function Hero() {
       badgeText: "Rewards Program",
       title: "Earn Points, Get Rewarded — Refer & Earn!",
       description:
-        "Invite friends to join Greenmarket and earn reward points for every successful referral.",
+        "Invite fellow farmers, buyers, and service providers to GREENMARKET and earn rewards while helping expand the agro ecosystem.",
       description2:
         "Use your points to boost your products for better visibility or withdraw them as cash. The more you refer, the more you earn!",
       imageUrl: "/assets/hero.svg", 

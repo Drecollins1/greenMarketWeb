@@ -118,19 +118,16 @@ const Profile = () => {
     fetchOrdersData();
   };
 
-  // Fetch dashboard data when component mounts or when activeTab changes to dashboard
   useEffect(() => {
     if (activeTab === "dashboard") {
       fetchDashboardData();
     }
   }, [activeTab]);
 
-  // Fetch user profile data
   useEffect(() => {
     fetchUserProfile();
   }, []);
 
-  // Fetch my products when products tab is active
   useEffect(() => {
     if (activeTab === "products") {
       fetchMyProducts();
@@ -204,7 +201,6 @@ const Profile = () => {
   };
 
   const handleImageUpdateSuccess = (newAvatar: string) => {
-    // Update the userProfile state with new avatar
     if (userProfile) {
       setUserProfile({
         ...userProfile,
@@ -212,15 +208,12 @@ const Profile = () => {
       });
     }
     
-    // Refresh dashboard data if needed
     if (activeTab === "dashboard") {
       fetchDashboardData();
     }
   };
 
-  // Add a helper function to handle image errors
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    // Fallback to default icon if image fails to load
     e.currentTarget.style.display = 'none';
     const parent = e.currentTarget.parentElement;
     if (parent) {
@@ -267,7 +260,6 @@ const Profile = () => {
     setSidebarOpen(false);
   };
 
-  // Get user display name
   const getUserDisplayName = () => {
     if (userProfile) {
       return userProfile.name;
@@ -275,7 +267,6 @@ const Profile = () => {
     return profile.email;
   };
 
-  // Get user email for display
   const getUserDisplayEmail = () => {
     if (userProfile) {
       return userProfile.email;
@@ -283,7 +274,6 @@ const Profile = () => {
     return profile.email;
   };
 
-  // Get product count from profile
   const getActualProductCount = () => {
     if (userProfile) {
       return userProfile.product_count;
@@ -479,7 +469,6 @@ const Profile = () => {
             </nav>
           </div>
 
-          {/* Main Content */}
           <div className="flex-1 bg-white rounded-lg shadow-sm p-4 sm:p-6 lg:p-8">
             {activeTab === "dashboard" && (
               <div>
@@ -525,7 +514,6 @@ const Profile = () => {
                         </div>
                       </div>
 
-                      {/* Products Card */}
                       <div className="bg-blue-50 p-4 sm:p-6 rounded-lg">
                         <div className="flex items-center justify-between">
                           <div>
@@ -540,7 +528,6 @@ const Profile = () => {
                         </div>
                       </div>
 
-                      {/* Escrow Card */}
                       <div className="bg-purple-50 p-4 sm:p-6 rounded-lg">
                         <div className="flex items-center justify-between">
                           <div>
@@ -555,7 +542,6 @@ const Profile = () => {
                         </div>
                       </div>
 
-                      {/* Tickets Card */}
                       <div className="bg-orange-50 p-4 sm:p-6 rounded-lg">
                         <div className="flex items-center justify-between">
                           <div>

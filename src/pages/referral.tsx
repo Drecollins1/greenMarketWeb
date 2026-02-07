@@ -77,19 +77,20 @@ export default function ReferralPage() {
                 Rewards Program
               </div>
 
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
-                Refer Friends,{" "}
+              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                Refer Fellow Farmers & Buyers,
                 <span className="text-[#39B54A]">Earn Rewards</span>
               </h1>
 
-              <p className="text-xl text-gray-600 mb-4">
-                Get paid for every friend you invite to GreenMarket.
+              <p className="text-xl text-gray-600 mb-4 font-medium">
+                Get paid for every Farmers & Buyers you invite to GreenMarket.
               </p>
 
               <p className="text-lg text-gray-500 mb-8">
-                Earn points when your referrals sign up, uploads a product, and
-                activates Premium. Use points to boost your listings or withdraw
-                as cash to your bank account.
+                Earn points when your referrals sign up, upload products, or
+                activate Premium or Top listings. Redeem your points to boost
+                your listings or withdraw them as cash directly to your bank
+                account.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">

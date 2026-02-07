@@ -36,6 +36,7 @@ import { FaX } from "react-icons/fa6";
 import { getCategories, CategoryItem } from "@/services/category";
 import MobileBottomNav from "@/components/MobileBottomNav";
 import Head from "next/head";
+import AIChatAssistant from "@/components/AIChatAssistant";
 
 type Category = {
   id: number;
@@ -74,7 +75,6 @@ function CategoryDrawer({
       onClose();
     }
   };
-  
 
   return (
     <div className="fixed inset-0 z-99998">
@@ -217,12 +217,6 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
           href: "/admin/adminMgt",
           badge: null,
         },
-        // {
-        //   icon: FaWrench,
-        //   label: "Settings",
-        //   href: "/admin/settings",
-        //   badge: null,
-        // },
       ],
     },
   ];
@@ -360,18 +354,17 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
 export default function App({ Component, pageProps }: AppProps) {
   const [catOpen, setCatOpen] = useState(false);
   const router = useRouter();
-  // const isAdminRoute = router.pathname.startsWith("/admin");
   const isAdminRoute = router.pathname?.startsWith("/admin") ?? false;
 
   return (
     <>
-    <Head>
-      <title>Green Market | Best Shop for Farm Product</title>
-      <meta
-        name="description"
-        content="Green Market is the best online shop for fresh farm products, organic foods, and agricultural supplies. Buy directly from trusted farmers."
-      />
-    </Head>
+      <Head>
+        <title>Green Market | Best Shop for Farm Product</title>
+        <meta
+          name="description"
+          content="Green Market is the best online shop for fresh farm products, organic foods, and agricultural supplies. Buy directly from trusted farmers."
+        />
+      </Head>
       {isAdminRoute ? (
         <AdminLayout>
           <Component {...pageProps} />
@@ -383,6 +376,8 @@ export default function App({ Component, pageProps }: AppProps) {
           <Component {...pageProps} />
           <MobileBottomNav />
           <Footer />
+          {/* AI Chat Assistant - Only on non-admin pages */}
+          <AIChatAssistant />
         </>
       )}
     </>

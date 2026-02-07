@@ -624,7 +624,7 @@ export default function ProductDetails() {
       {/* --- Escrow Modal --- */}
       {showEscrowModal && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-gray-200 bg-opacity-50 px-4"
+          className="fixed inset-0 z-999999 backdrop-blur supports-backdrop-filter:bg-white/60 flex items-center  justify-center bg-opacity-50 px-4"
           onClick={() => setShowEscrowModal(false)}
         >
           <div
