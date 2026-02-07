@@ -22,9 +22,11 @@ const AIChatAssistant: React.FC = () => {
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [quickQuestions, setQuickQuestions] = useState<string[]>([]);
-  const [buttonPosition, setButtonPosition] = useState<"left" | "right">("right");
+  const [buttonPosition, setButtonPosition] = useState<"left" | "right">(
+    "right",
+  );
   const [buttonTop, setButtonTop] = useState(
-    typeof window !== "undefined" ? window.innerHeight - 120 : 600
+    typeof window !== "undefined" ? window.innerHeight - 120 : 600,
   );
   const [isDragging, setIsDragging] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -54,11 +56,26 @@ const AIChatAssistant: React.FC = () => {
     "What are heirloom seeds?",
     "Best crops for small farms?",
     "How to preserve harvested vegetables?",
-    "What is permaculture?",
-    "How to test soil pH?",
-    "Best irrigation methods for farms?",
-    "What are cover crops?",
-    "How to attract pollinators to my farm?",
+    "How does GreenMarket escrow work?",
+    "Why should I use escrow on GreenMarket?",
+    "How do I sell on GreenMarket?",
+    "How do I buy safely on GreenMarket?",
+    "What is GreenMarket about?",
+    "Is GreenMarket really free to join?",
+    "Where can I download the GreenMarket app?",
+    "How can I earn money with referrals?",
+    "Tell me about the referral program",
+    "How do I get more buyers for my products?",
+    "What are Premium Services on GreenMarket?",
+    "How to post an ad on GreenMarket?",
+    "Safety tips for buying on GreenMarket?",
+    "How to become a verified seller?",
+    "Can I withdraw my referral earnings?",
+    "How much can I earn from referrals?",
+    "What makes GreenMarket different?",
+    "How does the community feature work?",
+    "Tips for selling like a pro?",
+    "How to contact buyers on GreenMarket?",
   ];
 
   // Generate random quick questions when chat opens
