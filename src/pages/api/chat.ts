@@ -23,7 +23,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // Retry logic for handling rate limits
-    let openRouterResponse: Response | undefined;
+    let openRouterResponse: Response | null = null;
     const maxRetries = 3;
     const retryDelays = [1000, 2000, 4000];
 
@@ -78,11 +78,11 @@ Remember: You're representing GreenMarket, a platform connecting farmers directl
         }),
       });
 
-      if (openRouterResponse.ok) {
+      if (openRouterResponse && openRouterResponse.ok) {
         break;
       }
 
-      if (openRouterResponse.status === 429 && attempt < maxRetries - 1) {
+      if (openRouterResponse && openRouterResponse.status === 429 && attempt < maxRetries - 1) {
         console.log(`Rate limited, retrying in ${retryDelays[attempt]}ms... (attempt ${attempt + 1}/${maxRetries})`);
         await wait(retryDelays[attempt]);
         continue;
@@ -91,11 +91,12 @@ Remember: You're representing GreenMarket, a platform connecting farmers directl
       break;
     }
 
-    // Check if response exists
+    // Check if response exists FIRST
     if (!openRouterResponse) {
       return res.status(500).json({ error: 'Failed to connect to AI service' });
     }
 
+    // Now TypeScript knows openRouterResponse is not null
     if (!openRouterResponse.ok) {
       const errorBody = await openRouterResponse.text();
       console.error(`OpenRouter failed → ${openRouterResponse.status}: ${errorBody}`);
