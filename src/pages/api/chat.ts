@@ -288,7 +288,12 @@ Remember: You're representing GreenMarket - Nigeria's #1 FREE agricultural marke
     }
 
     const data = await openRouterResponse.json();
-    const assistantMessage = data.choices?.[0]?.message?.content?.trim() || "";
+    let assistantMessage = data.choices?.[0]?.message?.content?.trim() || "";
+
+    assistantMessage = assistantMessage
+      .replace(/<think>[\s\S]*?<\/think>/gi, "")
+      .replace(/^[\s\S]*?(?=Great question!|Hello!|Hi!)/i, "")
+      .trim();
 
     if (!assistantMessage) {
       return res.status(500).json({ error: "No content received from model" });
