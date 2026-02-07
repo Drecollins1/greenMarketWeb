@@ -23,7 +23,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // Retry logic for handling rate limits
-    let openRouterResponse;
+    let openRouterResponse: Response | undefined;
     const maxRetries = 3;
     const retryDelays = [1000, 2000, 4000];
 
@@ -89,6 +89,11 @@ Remember: You're representing GreenMarket, a platform connecting farmers directl
       }
 
       break;
+    }
+
+    // Check if response exists
+    if (!openRouterResponse) {
+      return res.status(500).json({ error: 'Failed to connect to AI service' });
     }
 
     if (!openRouterResponse.ok) {
