@@ -148,6 +148,23 @@ export default function Hero() {
       <Slider {...settings}>
         {slides.map((slide, index) => {
           const Icon = slide.icon;
+          // Extract only the props we need for the slide content
+          const { 
+            title, 
+            description, 
+            description2, 
+            imageUrl, 
+            imageAlt, 
+            bg, 
+            bgMobile, 
+            buttonText, 
+            buttonLink, 
+            buttonPosition, 
+            centered, 
+            darkOverlay, 
+            badgeText, 
+            appLinks 
+          } = slide;
 
           return (
             <div key={index}>
@@ -155,48 +172,48 @@ export default function Hero() {
                 className="relative bg-center bg-no-repeat bg-cover min-h-[400px] md:min-h-[500px]"
                 style={{
                   backgroundImage: `url(${
-                    isMobile && slide.bgMobile ? slide.bgMobile : slide.bg
+                    isMobile && bgMobile ? bgMobile : bg
                   })`,
                 }}
               >
                 {/* Overlay */}
                 <div
                   className={`absolute inset-0 ${
-                    slide.darkOverlay ? "bg-[#000000]/50" : "bg-white/40"
+                    darkOverlay ? "bg-[#000000]/50" : "bg-white/40"
                   }`}
                 ></div>
 
                 {/* Conditional Layout: Centered or Left-Right */}
-                {slide.centered ? (
+                {centered ? (
                   <div className="relative z-10 flex flex-col items-center justify-center text-center p-6 py-12 md:py-16 lg:px-20 min-h-[400px] md:min-h-[500px]">
                     <div className="max-w-3xl">
                       <h1
                         className={`text-3xl md:text-5xl font-bold ${
-                          slide.darkOverlay ? "text-white" : "text-[#253D4E]"
+                          darkOverlay ? "text-white" : "text-[#253D4E]"
                         }`}
                       >
-                        {slide.title}
+                        {title}
                       </h1>
 
-                      {slide.description2 && (
+                      {description2 && (
                         <p
                           className={`mt-4 text-sm md:text-base ${
-                            slide.darkOverlay
-                              ? "text-white"
-                              : "text-[#253D4E]/80"
-                          }`}
+                          darkOverlay
+                            ? "text-white"
+                            : "text-[#253D4E]/80"
+                        }`}
                         >
-                          {slide.description2}
+                          {description2}
                         </p>
                       )}
 
-                      {slide.buttonLink && (
+                      {buttonLink && (
                         <div className="mt-8">
                           <Link
-                            href={slide.buttonLink}
+                            href={buttonLink}
                             className="inline-flex items-center gap-2 rounded-md bg-emerald-600 px-6 py-3 text-sm md:text-base text-white hover:bg-emerald-700 transition"
                           >
-                            {slide.buttonText}{" "}
+                            {buttonText}{" "}
                             <ChevronRight className="size-4" />
                           </Link>
                         </div>
@@ -208,51 +225,51 @@ export default function Hero() {
                   <div className="relative z-10 flex flex-col md:flex-row items-center justify-between p-6 py-12 md:py-10 lg:px-20 min-h-[400px] md:min-h-[500px]">
                     {/* LEFT SIDE */}
                     <div className="max-w-xl">
-                      {slide.badgeText && Icon && (
+                      {badgeText && Icon && (
                         <p className="inline-flex items-center gap-2 rounded-full bg-emerald-100/60 px-3 py-1 text-emerald-700 text-xs font-medium">
-                          <Icon className="size-4" /> {slide.badgeText}
+                          <Icon className="size-4" /> {badgeText}
                         </p>
                       )}
 
                       <h1 className="mt-3 text-3xl md:text-5xl font-bold text-[#253D4E]">
-                        {slide.title}
+                        {title}
                       </h1>
 
-                      {slide.description && (
+                      {description && (
                         <p className="mt-3 text-base md:text-lg font-semibold text-[#253D4E]">
-                          {slide.description}
+                          {description}
                         </p>
                       )}
 
-                      {slide.description2 && (
+                      {description2 && (
                         <p className="mt-2 text-sm md:text-base text-[#253D4E]/80">
-                          {slide.description2}
+                          {description2}
                         </p>
                       )}
 
                       {/* Escrow/Referral button (Left) */}
-                      {slide.buttonPosition === "left" && slide.buttonLink && (
+                      {buttonPosition === "left" && buttonLink && (
                         <div className="mt-6">
                           <Link
-                            href={slide.buttonLink}
+                            href={buttonLink}
                             className="inline-flex items-center gap-2 rounded-md bg-emerald-600 px-4 py-2 text-sm md:text-base text-white hover:bg-emerald-700 transition"
                           >
-                            {slide.buttonText}{" "}
+                            {buttonText}{" "}
                             <ChevronRight className="size-4" />
                           </Link>
                         </div>
                       )}
 
                       {/* App Store buttons (Center) */}
-                      {slide.buttonPosition === "center" && slide.appLinks && (
+                      {buttonPosition === "center" && appLinks && (
                         <div className="flex flex-col sm:flex-row gap-4 mt-6">
                           <GooglePlayButton
-                            url={slide.appLinks.android}
+                            url={appLinks.android}
                             theme="light"
                             className=" !p-1 !border !border-neutral-400"
                           />
                           <AppStoreButton
-                            url={slide.appLinks.ios}
+                            url={appLinks.ios}
                             theme="light"
                             className=" !p-1 !border !border-neutral-400"
                           />
@@ -261,12 +278,12 @@ export default function Hero() {
                     </div>
 
                     {/* RIGHT SIDE */}
-                    {slide.imageUrl && (
+                    {imageUrl && (
                       <div className="flex flex-col items-center mt-8 md:mt-0">
                         <div className="relative w-[240px] md:w-[340px] h-[200px] md:h-[280px]">
                           <Image
-                            src={slide.imageUrl}
-                            alt={slide.imageAlt}
+                            src={imageUrl}
+                            alt={imageAlt}
                             fill
                             className="object-contain rounded-lg"
                             priority={index === 0}
@@ -274,13 +291,13 @@ export default function Hero() {
                         </div>
 
                         {/* Community button (Right) */}
-                        {slide.buttonPosition === "right" &&
-                          slide.buttonLink && (
+                        {buttonPosition === "right" &&
+                          buttonLink && (
                             <Link
-                              href={slide.buttonLink}
+                              href={buttonLink}
                               className="inline-flex items-center gap-2 mt-6 rounded-md bg-emerald-600 px-4 py-2 text-sm md:text-base text-white hover:bg-emerald-700 transition"
                             >
-                              {slide.buttonText}{" "}
+                              {buttonText}{" "}
                               <ChevronRight className="size-4" />
                             </Link>
                           )}
