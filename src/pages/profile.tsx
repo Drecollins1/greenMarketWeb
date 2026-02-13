@@ -897,11 +897,11 @@ const Profile = () => {
                           </span>
                         </div>
 
-                        <Link href={`/edit-product/${product.id}`}>
+                        {/* <Link href={`/edit-product/${product.id}`}>
                           <button className="w-full border border-neutral-200 px-4 py-2 rounded-lg hover:bg-gray-50 text-sm">
                             Edit Product
                           </button>
-                        </Link>
+                        </Link> */}
                       </div>
                     ))}
                   </div>

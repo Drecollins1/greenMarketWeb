@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect, useRef } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { getCategories } from "@/services/category";
 import { getPlans } from "@/services/plan";
 import locationService from "@/services/country";
@@ -122,10 +122,6 @@ export default function EditProductForm({ productId }: Props) {
     tags: [] as string[],
   });
 
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-  
   const [tagInput, setTagInput] = useState("");
   const [isClient, setIsClient] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -155,6 +151,11 @@ export default function EditProductForm({ productId }: Props) {
   const [country] = useState("Nigeria");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Handle client-side rendering
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   // Handle client-side rendering
   if (!isClient) {
@@ -272,19 +273,6 @@ export default function EditProductForm({ productId }: Props) {
         const statesData = await locationService.getStates(country);
         if (statesData && statesData.length > 0) {
           setStates(statesData);
-          
-          // If form state is not set, auto-select Lagos
-          if (!formData.state) {
-            const lagosState = statesData.find((state) =>
-              state.name.toLowerCase().includes("lagos")
-            );
-            if (lagosState) {
-              setFormData((prev) => ({
-                ...prev,
-                state: lagosState.name,
-              }));
-            }
-          }
         } else {
           toast.error("Unable to load states. Please try again.");
         }
@@ -297,7 +285,7 @@ export default function EditProductForm({ productId }: Props) {
     }
 
     fetchNigerianStates();
-  }, [country, formData.state]);
+  }, [country]);
 
   // Fetch cities when state changes
   useEffect(() => {
@@ -312,14 +300,6 @@ export default function EditProductForm({ productId }: Props) {
         );
         if (citiesData && citiesData.length > 0) {
           setCities(citiesData);
-
-          // Auto-select first city if no city is selected
-          if (citiesData.length > 0 && !formData.city) {
-            setFormData((prev) => ({
-              ...prev,
-              city: citiesData[0],
-            }));
-          }
         } else {
           toast.error(
             `No cities found for ${formData.state}. Please select another state.`
@@ -338,7 +318,33 @@ export default function EditProductForm({ productId }: Props) {
     }
 
     fetchCitiesForState();
-  }, [formData.state, country, formData.city]);
+  }, [formData.state, country]);
+
+  // Auto-select Lagos and first city when states/cities load (only for new products, not editing)
+  useEffect(() => {
+    // Only auto-select if we're not loading product data and no state is set
+    if (!productLoading && states.length > 0 && !formData.state) {
+      const lagosState = states.find((state) =>
+        state.name.toLowerCase().includes("lagos")
+      );
+      if (lagosState) {
+        setFormData((prev) => ({
+          ...prev,
+          state: lagosState.name,
+        }));
+      }
+    }
+  }, [states, formData.state, productLoading]);
+
+  useEffect(() => {
+    // Only auto-select if we're not loading product data and no city is set
+    if (!productLoading && cities.length > 0 && !formData.city && formData.state) {
+      setFormData((prev) => ({
+        ...prev,
+        city: cities[0],
+      }));
+    }
+  }, [cities, formData.city, formData.state, productLoading]);
 
   // Fetch plans when modal opens
   useEffect(() => {
@@ -527,7 +533,7 @@ export default function EditProductForm({ productId }: Props) {
       // Prepare FormData
       const apiFormData = new FormData();
 
-      // Add required fields
+      // Add required fields (same as post-ad)
       apiFormData.append("category_id", formData.category);
       apiFormData.append("title", formData.title);
       apiFormData.append("description", formData.description);
@@ -537,7 +543,7 @@ export default function EditProductForm({ productId }: Props) {
       apiFormData.append("nearest", formData.busStop);
       apiFormData.append("use_escrow", "1");
 
-      // Add plan information
+      // Add plan information (same as post-ad)
       if (selectedPlanData) {
         apiFormData.append("plan[title]", selectedPlanData.title);
 
@@ -572,7 +578,7 @@ export default function EditProductForm({ productId }: Props) {
         apiFormData.append(`tags[${index}]`, tag);
       });
 
-      // Step 1: Update the product
+      // Step 1: Update the product using POST to /products/:id (same as post-ad)
       const updateProductResponse = await ApiFetcher.post(
         `/products/${productId}`,
         apiFormData,
@@ -592,7 +598,7 @@ export default function EditProductForm({ productId }: Props) {
       const updatedProdId = productData.data.id.toString();
       setUpdatedProductId(updatedProdId);
 
-      // Step 2: Handle based on plan type
+      // Step 2: Handle based on plan type (same as post-ad)
       if (isFreemium) {
         setShowPromoteModal(false);
         setShowPaymentSuccessModal(true);
@@ -1394,7 +1400,7 @@ export default function EditProductForm({ productId }: Props) {
                   {isSubmitting ? (
                     <div className="flex items-center gap-2">
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      Updating...
+                      Processing...
                     </div>
                   ) : (
                     "Update Product"

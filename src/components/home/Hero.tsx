@@ -169,7 +169,7 @@ export default function Hero() {
           return (
             <div key={index}>
               <div
-                className="relative bg-center bg-no-repeat bg-cover min-h-[400px] md:min-h-[500px]"
+                className="relative bg-center bg-no-repeat bg-cover min-h-100 md:min-h-125"
                 style={{
                   backgroundImage: `url(${
                     isMobile && bgMobile ? bgMobile : bg
@@ -185,7 +185,7 @@ export default function Hero() {
 
                 {/* Conditional Layout: Centered or Left-Right */}
                 {centered ? (
-                  <div className="relative z-10 flex flex-col items-center justify-center text-center p-6 py-12 md:py-16 lg:px-20 min-h-[400px] md:min-h-[500px]">
+                  <div className="relative z-10 flex flex-col items-center justify-center text-center p-6 py-12 md:py-16 lg:px-20 min-h-100 md:min-h-125">
                     <div className="max-w-3xl">
                       <h1
                         className={`text-3xl md:text-5xl font-bold ${
@@ -222,7 +222,7 @@ export default function Hero() {
                   </div>
                 ) : (
                   // STANDARD LEFT-RIGHT LAYOUT (for other slides)
-                  <div className="relative z-10 flex flex-col md:flex-row items-center justify-between p-6 py-12 md:py-10 lg:px-20 min-h-[400px] md:min-h-[500px]">
+                  <div className="relative z-10 flex flex-col md:flex-row items-center justify-between p-6 py-12 md:py-10 lg:px-20 min-h-100 md:min-h-125">
                     {/* LEFT SIDE */}
                     <div className="max-w-xl">
                       {badgeText && Icon && (
@@ -266,12 +266,12 @@ export default function Hero() {
                           <GooglePlayButton
                             url={appLinks.android}
                             theme="light"
-                            className=" !p-1 !border !border-neutral-400"
+                            className=" p-1! border! border-neutral-400!"
                           />
                           <AppStoreButton
                             url={appLinks.ios}
                             theme="light"
-                            className=" !p-1 !border !border-neutral-400"
+                            className=" p-1! border! border-neutral-400!"
                           />
                         </div>
                       )}
@@ -280,7 +280,7 @@ export default function Hero() {
                     {/* RIGHT SIDE */}
                     {imageUrl && (
                       <div className="flex flex-col items-center mt-8 md:mt-0">
-                        <div className="relative w-[240px] md:w-[340px] h-[200px] md:h-[280px]">
+                        <div className="relative w-60 md:w-85 h-50 md:h-70">
                           <Image
                             src={imageUrl}
                             alt={imageAlt}

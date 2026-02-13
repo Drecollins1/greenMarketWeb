@@ -8,6 +8,7 @@ export const revalidate = 0;
 
 export default function EditProductPage() {
   const params = useParams();
+  console.log("EditProductPage reached, params:", params);
 
   const productId =
     typeof params?.id === 'string' ? params.id : null;
