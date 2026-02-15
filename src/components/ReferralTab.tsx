@@ -333,7 +333,7 @@ const ReferralTab = () => {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-[#39B54A] to-[#2d8f3a] p-6 text-white">
+            <div className="bg-linear-to-r from-[#39B54A] to-[#2d8f3a] p-6 text-white">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-2xl font-bold">Withdraw Rewards</h3>
                 <button
@@ -570,7 +570,7 @@ const ReferralTab = () => {
                   !accountName ||
                   !pin
                 }
-                className="w-full py-4 bg-gradient-to-r from-[#39B54A] to-[#2d8f3a] text-white rounded-xl font-bold text-lg hover:shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+                className="w-full py-4 bg-linear-to-r from-[#39B54A] to-[#2d8f3a] text-white rounded-xl font-bold text-lg hover:shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
               >
                 {referralData.points < 2000
                   ? "Not Eligible Yet"

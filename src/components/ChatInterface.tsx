@@ -86,7 +86,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ activeTab }) => {
   if (activeTab !== "chat") return null;
 
   return (
-    <div className="flex h-[600px] bg-white rounded-lg border border-neutral-200">
+    <div className="flex h-150 bg-white rounded-lg border border-neutral-200">
       {/* Left Sidebar - Conversations List */}
       <div className="w-full md:w-80 lg:w-96 border-r border-gray-200 flex flex-col">
         {/* Header */}

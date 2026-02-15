@@ -85,7 +85,7 @@ export default function HowToSellBuy() {
             </div>
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 mb-4 leading-tight">
               Start Selling in{" "}
-              <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+              <span className="bg-linear-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
                 4 Easy Steps
               </span>
             </h2>
@@ -97,9 +97,9 @@ export default function HowToSellBuy() {
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
             {/* Left Side - Illustration with floating effect */}
             <div className="order-2 lg:order-1 relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/20 via-teal-400/20 to-green-400/20 rounded-[3rem] blur-2xl"></div>
-              <div className="relative bg-gradient-to-br from-emerald-50 to-teal-50 rounded-[3rem] p-8">
-                <div className="relative h-[400px] md:h-[500px]">
+              <div className="absolute inset-0 bg-linear-to-br from-emerald-400/20 via-teal-400/20 to-green-400/20 rounded-[3rem] blur-2xl"></div>
+              <div className="relative bg-linear-to-br from-emerald-50 to-teal-50 rounded-[3rem] p-8">
+                <div className="relative h-100 md:h-125">
                   <Image
                     src="/assets/undraw3.svg"
                     alt="Sell Online on GreenMarket"
@@ -128,13 +128,13 @@ export default function HowToSellBuy() {
                   <div key={index} className="group relative">
                     {/* Connecting line */}
                     {index < sellSteps.length - 1 && (
-                      <div className="absolute left-6 top-16 w-0.5 h-12 bg-gradient-to-b from-emerald-300 to-transparent"></div>
+                      <div className="absolute left-6 top-16 w-0.5 h-12 bg-linear-to-b from-emerald-300 to-transparent"></div>
                     )}
 
                     <div className="relative bg-white rounded-3xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-transparent hover:border-emerald-200 cursor-pointer">
                       <div className="flex gap-5">
                         {/* Icon & Number */}
-                        <div className="flex-shrink-0">
+                        <div className="shrink-0">
                           <div className="relative">
                             <div className="w-14 h-14  p-2 rounded-2xl flex items-center justify-center  group-hover:scale-110 transition-transform">
                               <Image
@@ -180,7 +180,7 @@ export default function HowToSellBuy() {
             </div>
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 mb-4 leading-tight">
               Shop Fresh in{" "}
-              <span className="bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent">
+              <span className="bg-linear-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent">
                 4 Simple Steps
               </span>
             </h2>
@@ -197,13 +197,13 @@ export default function HowToSellBuy() {
                   <div key={index} className="group relative">
                     {/* Connecting line */}
                     {index < buySteps.length - 1 && (
-                      <div className="absolute left-6 top-16 w-0.5 h-12 bg-gradient-to-b from-teal-300 to-transparent"></div>
+                      <div className="absolute left-6 top-16 w-0.5 h-12 bg-linear-to-b from-teal-300 to-transparent"></div>
                     )}
 
                     <div className="relative bg-white rounded-3xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-transparent hover:border-teal-200 cursor-pointer">
                       <div className="flex gap-5">
                         {/* Icon & Number */}
-                        <div className="flex-shrink-0">
+                        <div className="shrink-0">
                           <div className="relative">
                             <div className="w-14 h-14 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
                               <Image
@@ -236,9 +236,9 @@ export default function HowToSellBuy() {
             </div>
 
             <div className="order-2 relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-teal-400/20 via-emerald-400/20 to-green-400/20 rounded-[3rem] blur-2xl"></div>
-              <div className="relative bg-gradient-to-br from-teal-50 to-emerald-50 rounded-[3rem] p-8 ">
-                <div className="relative h-[400px] md:h-[500px]">
+              <div className="absolute inset-0 bg-linear-to-br from-teal-400/20 via-emerald-400/20 to-green-400/20 rounded-[3rem] blur-2xl"></div>
+              <div className="relative bg-linear-to-br from-teal-50 to-emerald-50 rounded-[3rem] p-8 ">
+                <div className="relative h-100 md:h-125">
                   <Image
                     src="/assets/undraw4.svg"
                     alt="Buy on GreenMarket"

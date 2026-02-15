@@ -308,7 +308,7 @@ const AIChatAssistant: React.FC = () => {
               ? { right: "24px", left: "auto" }
               : { left: "24px", right: "auto" }),
           }}
-          className={`fixed z-[9999] bg-gradient-to-r from-[#39B54A] to-emerald-600 text-white rounded-full p-4 shadow-2xl transition-all duration-300 group ${
+          className={`fixed z-9999 bg-linear-to-r from-[#39B54A] to-emerald-600 text-white rounded-full p-4 shadow-2xl transition-all duration-300 group ${
             isDragging
               ? "cursor-grabbing scale-110 shadow-green-500/60"
               : "cursor-grab hover:scale-110 hover:shadow-green-500/50"
@@ -338,21 +338,21 @@ const AIChatAssistant: React.FC = () => {
 
       {/* Backdrop Overlay */}
       {isOpen && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-[9998] md:hidden" />
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-9998 md:hidden" />
       )}
 
       {/* Chat Window */}
       {isOpen && (
         <div
           ref={chatWindowRef}
-          className="fixed z-[9999]
+          className="fixed z-9999
             /* Mobile: Full screen centered */
             inset-4 sm:inset-6
             /* Desktop: Bottom right */
             md:bottom-6 md:right-6 md:top-auto md:left-auto
-            md:w-[380px] md:h-[600px]
+            md:w-95 md:h-150
             /* Mobile: Max dimensions */
-            max-w-[500px] max-h-[700px]
+            max-w-125 max-h-175
             /* Center on mobile */
             mx-auto md:mx-0
             bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-green-200"
@@ -385,7 +385,7 @@ const AIChatAssistant: React.FC = () => {
           </div>
 
           {/* Messages Container */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-green-50/30 to-white">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-linear-to-b from-green-50/30 to-white">
             {messages.map((message, index) => (
               <div
                 key={index}
@@ -396,7 +396,7 @@ const AIChatAssistant: React.FC = () => {
                 <div
                   className={`max-w-[85%] sm:max-w-[80%] rounded-2xl px-4 py-3 ${
                     message.role === "user"
-                      ? "bg-gradient-to-r from-[#39B54A] to-emerald-600 text-white rounded-br-sm"
+                      ? "bg-linear-to-r from-[#39B54A] to-emerald-600 text-white rounded-br-sm"
                       : "bg-white border border-green-200 text-gray-800 rounded-bl-sm shadow-sm"
                   }`}
                 >
@@ -488,7 +488,7 @@ const AIChatAssistant: React.FC = () => {
               <button
                 onClick={handleSendMessage}
                 disabled={!inputMessage.trim() || isLoading}
-                className="bg-gradient-to-r from-[#39B54A] to-emerald-600 text-white p-3 rounded-xl hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:scale-105"
+                className="bg-linear-to-r from-[#39B54A] to-emerald-600 text-white p-3 rounded-xl hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:scale-105"
                 aria-label="Send message"
               >
                 <FaPaperPlane className="text-lg" />

@@ -2,11 +2,11 @@ import Image from "next/image";
 
 export default function AboutHero() {
   return (
-    <section className="bg-gradient-to-br from-emerald-50 to-teal-50 py-12 md:py-20 px-4">
+    <section className="bg-linear-to-br from-emerald-50 to-teal-50 py-12 md:py-20 px-4">
       <div className="max-w-7xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           {/* Left Side - Image */}
-          <div className="relative h-[300px] md:h-[400px] lg:h-[500px] rounded-2xl overflow-hidden order-2 lg:order-1">
+          <div className="relative h-75 md:h-100 lg:h-125 rounded-2xl overflow-hidden order-2 lg:order-1">
             <Image
               src="/assets/greenAbt.jpg"
               alt="Farmers selling at GreenMarket"
