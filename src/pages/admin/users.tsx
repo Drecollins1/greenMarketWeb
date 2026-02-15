@@ -333,7 +333,7 @@ const UserDataTable: React.FC = () => {
                 {users.map((user) => (
                   <tr key={user.id} className="hover:bg-gray-50">
                     
-                    <td className="px-4 py-4 text-sm text-green-600 font-medium">#{user.id}</td>
+                    <td className="px-4 py-4 text-sm text-green-600 font-medium">{user.id}</td>
                     <td className="px-4 py-4">
                       {user.avatar ? (
                         <div className="relative w-10 h-10">
