@@ -358,12 +358,12 @@ const AIChatAssistant: React.FC = () => {
             bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-green-200"
         >
           {/* Header */}
-          <div className="bg-[#39B54A] from-green-500 to-emerald-600 text-white p-4 flex items-center justify-between shrink-0">
-            <div className="flex items-center gap-3">
-              <div className="bg-white p-2 rounded-full">
+          <div className="bg-[#39B54A] from-green-500 to-emerald-600 text-white p-2 flex items-center justify-between shrink-0">
+            <div className="flex items-center gap-10">
+              <div className=" rounded-full">
                 <Image
                   alt="Greenmarket Logo"
-                  src="/assets/GMAIA.png"
+                  src="/assets/ailogowhite.png"
                   width={100}
                   height={100}
                 />
